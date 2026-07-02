@@ -1,0 +1,34 @@
+{
+  "appProfile": "BillingChange",
+  "description": "Permissions for changing budgets, limits, billing policies and pay-as-you-go related configuration.",
+  "includesExchangeOnline": false,
+  "includesMailboxAccess": false,
+  "includesBudgetChange": true,
+  "permissions": [
+    { "resource": "Microsoft Graph", "permission": "Reports.Read.All", "type": "Application", "reason": "Read usage and governance reports needed before billing or budget changes." },
+    { "resource": "Microsoft Graph", "permission": "Directory.Read.All", "type": "Application", "reason": "Resolve owners and authorized change approvers for billing workflows." },
+    { "resource": "Microsoft Graph", "permission": "Application.Read.All", "type": "Application", "reason": "Read app and service principal context for governance and change impact." },
+    { "resource": "Microsoft Graph", "permission": "AgentRegistration.Read.All", "type": "Application", "reason": "Read registered agents before budget or billing related changes." },
+    { "resource": "Microsoft Graph", "permission": "AgentRegistration.ReadWrite.All", "type": "Application", "reason": "Perform approved changes affecting agent registration or governance state where supported." },
+    { "resource": "Microsoft Graph", "permission": "CopilotPackages.Read.All", "type": "Application", "reason": "Read Copilot package metadata in application contexts." },
+    { "resource": "Microsoft Graph", "permission": "AppCatalog.ReadWrite.All", "type": "Application", "reason": "Modify app catalog entries (block/install) in application contexts." },
+    { "resource": "Microsoft Graph", "permission": "CopilotPackages.ReadWrite.All", "type": "Application", "reason": "Apply approved changes to Copilot package metadata where supported." },
+    { "resource": "Microsoft Graph", "permission": "CopilotSettings-LimitedMode.Read", "type": "Delegated", "reason": "Read Limited Mode settings during signed-in billing or capacity review flows." },
+    { "resource": "Microsoft Graph", "permission": "CopilotSettings-LimitedMode.ReadWrite", "type": "Delegated", "reason": "Change Limited Mode settings only after dry-run and explicit approval." },
+    { "resource": "Microsoft Graph", "permission": "CopilotPolicySettings.Read", "type": "Delegated", "reason": "Read Copilot policy settings for billing and capacity impact review." },
+    { "resource": "Microsoft Graph", "permission": "CopilotPolicySettings.ReadWrite", "type": "Delegated", "reason": "Change Copilot policy settings only after dry-run and explicit approval." },
+    { "resource": "Microsoft Graph", "permission": "Reports.Read.All", "type": "Delegated", "reason": "Read reports in signed-in billing review flows." },
+    { "resource": "Microsoft Graph", "permission": "AgentRegistration.Read.All", "type": "Delegated", "reason": "Read registered agents in signed-in billing review flows." },
+    { "resource": "Microsoft Graph", "permission": "AgentRegistration.ReadWrite.All", "type": "Delegated", "reason": "Perform approved delegated agent changes where required by API." },
+    { "resource": "Microsoft Graph", "permission": "CopilotPackages.Read.All", "type": "Delegated", "reason": "Read Copilot package metadata in signed-in billing review flows." },
+    { "resource": "Microsoft Graph", "permission": "CopilotPackages.ReadWrite.All", "type": "Delegated", "reason": "Change Copilot package metadata only after dry-run and explicit approval." },
+    { "resource": "Microsoft Graph", "permission": "AppCatalog.ReadWrite.All", "type": "Delegated", "reason": "Modify app catalog entries (block/install) in delegated sessions." },
+    { "resource": "WorkIQ", "permission": "WorkIQAgent.Ask", "type": "Delegated", "reason": "Enable approved signed-in WorkIQ agent query flows. The WorkIQ service principal is only a prerequisite resource, not a separate app profile." }
+  ],
+  "requiresManualApproval": true,
+  "requiresDryRun": true,
+  "notes": [
+    "BillingChange is the only profile marked for budget or billing changes.",
+    "WorkIQ is tracked as a prerequisite service principal only."
+  ]
+}

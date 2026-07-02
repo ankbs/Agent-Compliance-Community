@@ -1,0 +1,16 @@
+[
+  {
+    "name": "CoPilot Abrechnung",
+    "service": "M365 Pay-as-you-go",
+    "subscriptionId": "86a917bb-3cf4-40be-ac42-1b813e729e24",
+    "subscriptionName": "Azure (MyCloudOfficeDEV)",
+    "resourceGroup": "rg-PurviewDemoStorageDEWC"
+  },
+  {
+    "name": "PowerPlatformAbrechnungsplanCopilotStudio",
+    "service": "Power Platform / Copilot Studio",
+    "subscriptionId": "86a917bb-3cf4-40be-ac42-1b813e729e24",
+    "subscriptionName": "Azure (MyCloudOfficeDEV)",
+    "resourceGroup": "rg-PurviewDemoStorageDEWC"
+  }
+]

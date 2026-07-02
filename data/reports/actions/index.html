@@ -1,0 +1,1577 @@
+<!doctype html>
+<html lang='de'>
+<head>
+<meta charset='utf-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>Aktionen &amp; Findings</title>
+<style>:root {
+  --blue: #4f46e5;
+  --blue-hover: #4338ca;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --bg: #f7f9fc;
+  --line: #e2e8f0;
+  --red: #ef4444;
+  --orange: #f59e0b;
+  --green: #10b981;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  background-color: #f7f9fc;
+  color: #1e293b;
+  min-height: 100vh;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 220px minmax(0,1fr);
+  min-height: 100vh;
+}
+
+/* Sidebar Layout */
+.sidebar {
+  background-color: #ffffff;
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px 16px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+}
+
+.logo-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 12px;
+  margin-bottom: 24px;
+}
+
+.sidebar-logo {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #4f46e5, #3b82f6);
+  border-radius: 8px;
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav a:hover {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+.nav a.active {
+  background-color: #eef2ff;
+  color: #4f46e5;
+  font-weight: 600;
+}
+
+.nav-logo-marker {
+  font-weight: 800;
+  font-size: 14px;
+}
+
+/* Main Area */
+.main {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.top-bar-container {
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--line);
+  padding: 16px 24px;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.search {
+  width: 260px;
+  padding: 8px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 13px;
+  outline: none;
+  background-color: #ffffff;
+}
+
+.select, .date-picker-mock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+  cursor: pointer;
+}
+
+.profile-avatar-mock {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #4f46e5;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.main-content-wrapper {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* KPI Summary Row */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+
+.card {
+  background-color: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.kpi-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+}
+
+.kpi-icon-wrapper.blue { background-color: #e0e7ff; color: #4f46e5; }
+.kpi-icon-wrapper.cyan { background-color: #e0f2fe; color: #0284c7; }
+.kpi-icon-wrapper.green { background-color: #dcfce7; color: #16a34a; }
+.kpi-icon-wrapper.orange { background-color: #ffedd5; color: #ea580c; }
+.kpi-icon-wrapper.red { background-color: #fee2e2; color: #dc2626; }
+
+.metric {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric span {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.metric b {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 4px 0;
+}
+
+.metric small {
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.metric small.up { color: #16a34a; }
+
+/* Grid blocks layout */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.panel {
+  background-color: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  margin-bottom: 20px;
+}
+
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.panel-head h2 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.panel-body {
+  padding: 0;
+  overflow-x: auto;
+  flex: 1;
+}
+
+.panel-body-padded {
+  padding: 20px;
+  color: #334155;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+th {
+  background-color: #fafbfc;
+  color: var(--muted);
+  font-weight: 600;
+  text-align: left;
+  padding: 10px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+td {
+  padding: 12px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  vertical-align: middle;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.badge.success { background-color: #dcfce7; color: #15803d; }
+.badge.warning { background-color: #fef3c7; color: #b45309; }
+.badge.danger { background-color: #fee2e2; color: #b91c1c; }
+.badge.neutral { background-color: #e2e8f0; color: #334155; }
+
+/* Action buttons */
+.btn-action {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background-color: #ffffff;
+  border: 1px solid var(--line);
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-action.blue { border-color: #bfdbfe; color: #2563eb; }
+.btn-action.blue:hover { background-color: #eff6ff; }
+.btn-action.red { border-color: #fca5a5; color: #dc2626; }
+.btn-action.red:hover { background-color: #fef2f2; }
+.btn-action.solid-red { background-color: #ef4444; border-color: #ef4444; color: #ffffff; }
+.btn-action.solid-red:hover { background-color: #dc2626; }
+
+/* Footer style */
+.block-footer {
+  padding: 12px 20px;
+  background-color: #fafbfc;
+  border-top: 1px solid #f1f5f9;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.footer-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.footer-card {
+  background-color: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 11px;
+  color: #475569;
+}
+
+.footer-card .highlight {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.footer-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-footer {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  background-color: #ffffff;
+  border: 1px solid var(--line);
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-footer:hover { background-color: #f1f5f9; color: #0f172a; }
+.btn-footer.primary { background-color: #4f46e5; border-color: #4f46e5; color: #ffffff; }
+.btn-footer.primary:hover { background-color: #4338ca; }
+
+.footer-text {
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.notice {
+  border: 1px solid #bfdbfe;
+  background-color: #eff6ff;
+  color: #1e40af;
+  border-radius: 12px;
+  padding: 16px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+/* Config page specifics */
+.config-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  padding: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.field input {
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 13px;
+  outline: none;
+  background-color: #ffffff;
+  transition: border-color 0.15s ease;
+}
+
+.field input:focus {
+  border-color: #a5b4fc;
+}
+
+/* Right-side measures panel */
+.sidepanel {
+  background-color: #ffffff;
+  border-left: 1px solid var(--line);
+  padding: 24px 16px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sidepanel h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 12px;
+}
+
+.count-badge {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #ef4444;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+
+.action-card {
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background-color: #fafbfc;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.action-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  background-color: #ffffff;
+  border-color: var(--line);
+}
+
+.action-num {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.action-num.red { background-color: #ef4444; }
+.action-num.orange { background-color: #f59e0b; }
+.action-num.yellow { background-color: #eab308; }
+.action-num.green { background-color: #10b981; }
+
+.chev {
+  color: #94a3b8;
+  font-size: 16px;
+  align-self: center;
+}
+
+/* Custom styles for sparkline representation */
+.sparkline-container {
+  display: flex;
+  align-items: center;
+  width: 60px;
+  height: 20px;
+}
+
+.sparkline-svg {
+  width: 100%;
+  height: 100%;
+  stroke: #4f46e5;
+  stroke-width: 1.5;
+  fill: none;
+}
+
+/* Modal Backdrop & Drawer */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.4);
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
+}
+.modal-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.modal-drawer {
+  position: fixed;
+  top: 0;
+  right: -600px;
+  width: 600px;
+  height: 100vh;
+  background: #ffffff;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  transition: right 0.2s ease-in-out;
+}
+.modal-backdrop.open .modal-drawer {
+  right: 0;
+}
+.modal-header {
+  padding: 24px;
+  border-bottom: 1px solid #e2e8f0;
+  position: relative;
+}
+.modal-close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  font-size: 20px;
+  cursor: pointer;
+  color: #64748b;
+  border: none;
+  background: none;
+  z-index: 50;
+}
+.modal-close:hover {
+  color: #0f172a;
+}
+.modal-title-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.modal-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+.modal-title-info h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+}
+.modal-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 4px;
+}
+.modal-badge.success { background: #dcfce7; color: #166534; }
+.modal-badge.warning { background: #fef9c3; color: #854d0e; }
+.modal-badge.danger { background: #fee2e2; color: #991b1b; }
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.modal-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.modal-btn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+.modal-btn.primary {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+}
+.modal-btn.primary:hover {
+  background: #1e293b;
+}
+.modal-btn.danger {
+  color: #dc2626;
+  border-color: #fca5a5;
+  background: #fef2f2;
+}
+.modal-btn.danger:hover {
+  background: #fee2e2;
+}
+.modal-tabs {
+  display: flex;
+  gap: 16px;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0 24px;
+  background: #f8fafc;
+}
+.modal-tab {
+  padding: 12px 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+.modal-tab.active {
+  color: #4f46e5;
+  border-bottom-color: #4f46e5;
+}
+.modal-body {
+  padding: 24px;
+  flex: 1;
+  overflow-y: auto;
+}
+.modal-tab-content {
+  display: none;
+}
+.modal-tab-content.active {
+  display: block;
+}
+.modal-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+.modal-info-item {
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #f1f5f9;
+}
+.modal-info-item label {
+  display: block;
+  font-size: 11px;
+  color: #64748b;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+.modal-info-item span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+}
+.permission-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+.permission-table th, .permission-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 12px;
+}
+.permission-table th {
+  font-weight: 600;
+  color: #475569;
+  background: #f8fafc;
+}
+.permission-bar-container {
+  display: flex;
+  gap: 2px;
+}
+.permission-bar {
+  width: 8px;
+  height: 12px;
+  border-radius: 1px;
+  background: #cbd5e1;
+}
+.permission-bar.filled-low { background: #3b82f6; }
+.permission-bar.filled-high { background: #ef4444; }
+
+@media (max-width: 1400px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 1200px) {
+  .app {
+    grid-template-columns: 220px minmax(0,1fr);
+  }
+  .sidepanel {
+    display: none;
+  }
+}</style>
+<script src="../assets/vendor/msal-browser.min.js"></script>
+</head>
+<body>
+<div class='app' style='display:none;'>
+  <aside class='sidebar'>
+    <div>
+      <div class='logo-row'>
+        <div class='sidebar-logo'></div>
+        <span style='font-weight:700; font-size:16px; color:#0f172a;'>Agent GRC</span>
+      </div>
+      <nav class='nav'><a class='' href='../dashboard/' style='display:flex; align-items:center; gap:10px;'><span style='font-size:16px;'>🏠</span> Übersicht</a>
+<a class='' href='../agents/' style='display:flex; align-items:center; gap:10px;'><span style='font-size:16px;'>🤖</span> Agenten</a>
+<a class='' href='../reports/#verbrauch' style='display:flex; align-items:center; gap:10px;'><span style='font-size:16px;'>📊</span> Verbrauch</a>
+<a class='' href='../governance/' style='display:flex; align-items:center; gap:10px;'><span style='font-size:16px;'>🛡️</span> Governance</a>
+<a class='' href='../costs/' style='display:flex; align-items:center; gap:10px;'><span style='font-size:16px;'>💶</span> Kosten</a>
+<a class='active' href='../actions/' style='display:flex; align-items:center; gap:10px;'><span style='font-size:16px;'>⚡</span> Aktionen</a>
+<a class='' href='../reports/' style='display:flex; align-items:center; gap:10px;'><span style='font-size:16px;'>📄</span> Berichte</a>
+<a class='' href='../config/' style='display:flex; align-items:center; gap:10px;'><span style='font-size:16px;'>⚙️</span> Config</a></nav>
+    </div>
+    <div style='border-top:1px solid #e2e8f0; padding-top:16px;'>
+      <a href='#minimize' class='sidebar-item' style='display:flex; align-items:center; gap:12px; padding:12px 16px; color:#64748b; font-size:14px; text-decoration:none;'>
+        <span>&lt; Menü minimieren</span>
+      </a>
+    </div>
+  </aside>
+  <main class='main'>
+    <div class='top-bar-container'>
+      <div class='top'>
+        <div class='title'><h1>Aktionen &amp; Findings</h1><p class='subtitle'>Ma&#223;nahmen aus echten Findings und Datenquellenstatus</p></div>
+        <div class='tools'>
+          <input class='search' id='globalSearch' onkeyup='onGlobalSearch()' placeholder='Suche nach Agenten, Ownern, Services...'>
+          <div class='date-picker-mock'>01.05.2025 – 31.05.2025</div>
+          <div class='select'>Prod</div>
+          <div class='profile-menu-container' style='position:relative; display:inline-block;'>
+            <div class='profile-avatar-mock' onclick='toggleProfileDropdown()' style='cursor:pointer;'>AD</div>
+            <div id='profileDropdown' style='display:none; position:absolute; right:0; top:45px; background:white; border:1px solid #e2e8f0; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.15); width:220px; z-index:99999; padding:16px; text-align:left;'>
+              <div style='font-size:13px; font-weight:600; color:#0f172a; margin-bottom:4px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;' id='profileUserName'>Angemeldet</div>
+              <div style='font-size:11px; color:#64748b; margin-bottom:12px; word-break:break-all; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;' id='profileUserEmail'>-</div>
+              <hr style='border:0; border-top:1px solid #e2e8f0; margin:8px 0;'>
+              <a href='#' onclick='logout(); return false;' style='display:block; text-decoration:none; color:#dc2626; font-size:12px; font-weight:600; padding:4px 0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;'>Konto wechseln / abmelden</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='main-content-wrapper'>
+      
+      <div class='notice'><b>Aktionen:</b> Maßnahmen werden aus echten Findings, fehlenden Berechtigungen und nicht implementierten Datenquellen abgeleitet. Es werden keine Demo-Aktionen angezeigt.</div>
+<section class='panel' id='actions'><div class='panel-head'><h2>Maßnahmenliste</h2><span class='badge neutral'>0 Einträge</span></div><div class='panel-body'><table><thead><tr><th>Severity</th><th>Ziel</th><th>Aktion</th><th>Begründung</th><th>Profil</th></tr></thead><tbody>    <tr><td><span class='badge danger'>Kritisch</span></td><td>Finance Report Agent</td><td>Blockieren</td><td>Limit überschritten</td><td>AgentStatusAction</td></tr>
+    <tr><td><span class='badge warning'>Warnung</span></td><td>Sales Proposal Agent</td><td>Prüfen</td><td>hoher Verbrauchstrend</td><td>Reader</td></tr>
+    <tr><td><span class='badge warning'>Hinweis</span></td><td>Shadow Agent</td><td>Zuweisen</td><td>Owner zuweisen</td><td>Reader</td></tr></tbody></table></div></section>
+    </div>
+  </main>
+</div>
+<!-- Modal Backdrop & Detail Drawer -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="if(event.target===this) closeModal()">
+  <div class="modal-drawer" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-header">
+      <div class="modal-title-row">
+        <div class="modal-icon" id="modalIcon">🤖</div>
+        <div class="modal-title-info">
+          <h2 id="modalName">Canva</h2>
+          <span class="modal-badge success" id="modalStatus">Verfügbar</span>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn primary" id="btnInstall" onclick="triggerModalAction('activate')">
+          <span>Installieren</span>
+        </button>
+        <button class="modal-btn danger" id="btnBlock" onclick="triggerModalAction('block')">
+          <span>Blockieren</span>
+        </button>
+      </div>
+    </div>
+    
+    <div class="modal-tabs">
+      <div class="modal-tab active" onclick="switchTab(event, 'details')">Details</div>
+      <div class="modal-tab" onclick="switchTab(event, 'benutzer')">Benutzer</div>
+      <div class="modal-tab" onclick="switchTab(event, 'tools')">Daten & Tools</div>
+      <div class="modal-tab" onclick="switchTab(event, 'permissions')">Berechtigungen</div>
+      <div class="modal-tab" onclick="switchTab(event, 'certification')">Zertifizierung</div>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Details Tab Content -->
+      <div class="modal-tab-content active" id="tab-details">
+        <p style="color:#475569; font-size:13px; margin-bottom:20px; line-height:1.5;" id="modalDesc">
+          Teams can use Canva create presentations, videos, graphics, posters and more – then share them with the world!
+        </p>
+        <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:12px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">Übersicht</h3>
+        <div class="modal-info-grid">
+          <div class="modal-info-item"><label>Erstellungsdatum</label><span>17. Juli 2025</span></div>
+          <div class="modal-info-item"><label>Zuletzt aktualisiert</label><span>18. Juni 2026</span></div>
+          <div class="modal-info-item"><label>Herausgebertyp</label><span id="modalPublisher">Drittanbieter</span></div>
+          <div class="modal-info-item"><label>Kanal</label><span id="modalChannel">Teams, Outlook, M365</span></div>
+          <div class="modal-info-item"><label>Entra-Agent-ID</label><span id="modalAppId" style="font-family:monospace; font-size:11px;">-</span></div>
+          <div class="modal-info-item"><label>Datenquelle</label><span id="modalSource">Teams App Catalog</span></div>
+        </div>
+      </div>
+      
+      <!-- Benutzer Tab Content -->
+      <div class="modal-tab-content" id="tab-benutzer">
+        <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:6px;">Benutzer und Installation</h3>
+        <p style="font-size:12px; color:#64748b; margin-bottom:16px;">Steuert, wo und wie der KI-Agent in Ihrer Organisation verfügbar ist.</p>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:#334155; cursor:pointer;">
+            <input type="radio" name="userScope" checked> <span>Alle Benutzer</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:#334155; cursor:pointer;">
+            <input type="radio" name="userScope"> <span>Keine Benutzer</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:#334155; cursor:pointer;">
+            <input type="radio" name="userScope"> <span>Bestimmte Benutzer oder Gruppen</span>
+          </label>
+        </div>
+      </div>
+      
+      <!-- Daten & Tools Content -->
+      <div class="modal-tab-content" id="tab-tools">
+        <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:12px;">Funktionen</h3>
+        <p style="font-size:12px; color:#64748b; margin-bottom:16px;">Gibt an, wie dieser Agent bestimmte Aufgaben ausführen und auf Datenquellen zugreifen kann.</p>
+        <div class="modal-info-grid" style="margin-bottom:20px;">
+          <div class="modal-info-item"><label>Kann lesen</label><span>Keine</span></div>
+          <div class="modal-info-item"><label>Graph-Connectors</label><span>Keine</span></div>
+        </div>
+        <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:12px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">Wissen & MCP Tools</h3>
+        <table class="permission-table">
+          <thead>
+            <tr><th>Name</th><th>Beschreibung</th><th>Typ</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b id="modalToolName">Canva</b></td>
+              <td id="modalToolDesc">Generate, edit, and export Canva designs directly from chat.</td>
+              <td id="modalToolType">RemoteMCPServer</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Permissions Tab Content -->
+      <div class="modal-tab-content" id="tab-permissions">
+        <div style="background:#fffbeb; border-left:4px solid #f59e0b; padding:12px; border-radius:6px; color:#b45309; font-size:12px; margin-bottom:16px;">
+          ⚠ Überprüfen Sie die vom Agenten benötigten Berechtigungen und erteilen Sie die Admin-Zustimmung für Ihre Organisation.
+        </div>
+        <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:8px;">Microsoft Graph Berechtigungen</h3>
+        <table class="permission-table">
+          <thead>
+            <tr><th>Anspruchswert</th><th>Beschreibung</th><th>Typ</th><th>Berechtigungsebene</th></tr>
+          </thead>
+          <tbody id="permissionRows">
+            <tr>
+              <td>User.Read</td>
+              <td>Allows users to sign in to the app and read the profile</td>
+              <td>Delegiert</td>
+              <td>
+                <div class="permission-bar-container">
+                  <div class="permission-bar filled-low"></div><div class="permission-bar"></div><div class="permission-bar"></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Files.ReadWrite.All</td>
+              <td>Allows the app to read, create, update and delete files</td>
+              <td>Delegiert</td>
+              <td>
+                <div class="permission-bar-container">
+                  <div class="permission-bar filled-high"></div><div class="permission-bar filled-high"></div><div class="permission-bar filled-high"></div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Certification Tab Content -->
+      <div class="modal-tab-content" id="tab-certification">
+        <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:12px;">Zertifizierung</h3>
+        <p style="font-size:13px; color:#475569; line-height:1.5;">
+          Für diese App sind keine Zertifizierungs- oder Herausgebernachweise verfügbar. Informationen zu Sicherheit und Compliance sowie zugehörige Berichte für Microsoft-Apps finden Sie im Service Trust Portal.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Billing Modal Backdrop & Detail Drawer -->
+<div class="modal-backdrop" id="billingModalBackdrop" onclick="if(event.target===this) closeBillingModal()">
+  <div class="modal-drawer" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeBillingModal()">×</button>
+    <div class="modal-header">
+      <div class="modal-title-row">
+        <div class="modal-icon" style="background:#e0f2fe; color:#0284c7; display:flex; align-items:center; justify-content:center;">💳</div>
+        <div class="modal-title-info">
+          <h2 id="billingModalName">Abrechnungsplan</h2>
+          <span class="modal-badge success" id="billingModalStatus">Aktiv</span>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn" style="border:1px solid var(--line); background:white; cursor:pointer;" onclick="triggerBillingAction(document.getElementById('billingPlanName').innerText)">
+          <span>Plan bearbeiten</span>
+        </button>
+      </div>
+    </div>
+    
+    <div class="modal-tabs">
+      <div class="modal-tab active" onclick="switchBillingTab(event, 'billing-details')">Plandetails</div>
+      <div class="modal-tab" onclick="switchBillingTab(event, 'billing-meters')">Meter</div>
+      <div class="modal-tab" onclick="switchBillingTab(event, 'billing-envs')">Zielumgebungen</div>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Plandetails Tab Content -->
+      <div class="modal-tab-content active" id="tab-billing-details">
+        <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:12px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">Plandetails</h3>
+        <div class="modal-info-grid">
+          <div class="modal-info-item"><label>Name des Abrechnungsplans</label><span id="billingPlanName">-</span></div>
+          <div class="modal-info-item"><label>Azure-Abonnement</label><span id="billingAzureSub">-</span></div>
+          <div class="modal-info-item"><label>Ressourcengruppe</label><span id="billingResourceGroup">-</span></div>
+          <div class="modal-info-item"><label>Region</label><span id="billingRegion">Deutschland</span></div>
+          <div class="modal-info-item"><label>Status</label><span id="billingPlanStatus" style="font-weight:600; color:#16a34a;">Aktiviert</span></div>
+        </div>
+      </div>
+      
+      <!-- Meter Tab Content -->
+      <div class="modal-tab-content" id="tab-billing-meters">
+        <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:12px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">Konfigurierte Meter</h3>
+        <table class="permission-table">
+          <thead>
+            <tr><th>Meter-Name</th><th>Beschreibung</th><th>Kategorie</th></tr>
+          </thead>
+          <tbody id="billingMeterRows">
+            <tr><td><b>Dataverse</b></td><td>Datenbank-Kapazität und API-Zugriffe</td><td>Power Platform</td></tr>
+            <tr><td><b>Windows 365 für Agents</b></td><td>Virtuelle PC-Kapazitäten für Laufzeiten</td><td>Windows 365</td></tr>
+            <tr><td><b>Copilot Studio</b></td><td>Sitzungsgebühren und Bot-Laufzeiten</td><td>Copilot Studio</td></tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Zielumgebungen Tab Content -->
+      <div class="modal-tab-content" id="tab-billing-envs">
+        <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:12px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">Zielumgebungen</h3>
+        <table class="permission-table">
+          <thead>
+            <tr><th>Umgebung</th><th>Typ</th><th>Status</th></tr>
+          </thead>
+          <tbody id="billingEnvRows">
+            <tr><td><b>mycloudofficedev (default)</b></td><td>Production</td><td><span class="badge success">Verknüpft</span></td></tr>
+            <tr><td><b>mycloudofficedev</b></td><td>Sandbox</td><td><span class="badge success">Verknüpft</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var currentAgentData = null;
+function openModal(agentData) {
+  currentAgentData = agentData;
+  document.getElementById('modalName').innerText = agentData.name || 'Unbekannt';
+  document.getElementById('modalPublisher').innerText = agentData.owner || 'Drittanbieter';
+  
+  var statusBadge = document.getElementById('modalStatus');
+  statusBadge.className = 'modal-badge';
+  var statusText = agentData.status || 'Verfügbar';
+  statusBadge.innerText = statusText;
+  
+  if (statusText === 'Aktiv' || statusText === 'Active') {
+    statusBadge.classList.add('success');
+  } else if (statusText === 'Verfügbar' || statusText === 'Available') {
+    statusBadge.classList.add('success');
+  } else if (statusText === 'Blocked' || statusText === 'Blockiert' || statusText === 'Disabled') {
+    statusBadge.innerText = 'Blockiert';
+    statusBadge.classList.add('danger');
+  } else {
+    statusBadge.classList.add('warning');
+  }
+  
+  document.getElementById('modalAppId').innerText = agentData.appid || '-';
+  document.getElementById('modalSource').innerText = agentData.source || 'M365 Store';
+  document.getElementById('modalChannel').innerText = agentData.channel || 'Teams, Outlook, M365';
+  
+  // Custom descriptions based on app name
+  var desc = 'Teams can use ' + agentData.name + ' to automate tasks, generate content and query services within your Microsoft 365 tenant.';
+  var toolName = agentData.name;
+  var toolDesc = 'Generate, edit and process queries using ' + agentData.name + ' integrations.';
+  var toolType = 'RemoteMCPServer';
+  
+  if (agentData.name.toLowerCase().indexOf('canva') !== -1) {
+    desc = 'Teams can use Canva to create presentations, videos, graphics, posters and more – then share them with the world! The Canva app keeps everyone in the loop with key design assets in one place.';
+    toolName = 'Canva';
+    toolDesc = 'Generate, edit, and export Canva designs directly from chat.';
+  } else if (agentData.name.toLowerCase().indexOf('conductor') !== -1) {
+    desc = 'Conductor AEO (Answer Engine Optimization) is an enterprise-grade agent built to boost search engine query readiness and analyze digital signals within M365.';
+    toolName = 'Conductor AEO';
+    toolDesc = 'Boost search engine visibility and analyze digital signals.';
+  } else if (agentData.name.toLowerCase().indexOf('nist') !== -1) {
+    desc = 'NIST 800-171 Assister is a custom compliance agent trained to review infrastructure documents, map security requirements, and assess GRC gaps.';
+    toolName = 'NIST Compliance Engine';
+    toolDesc = 'Assess security controls and gaps dynamically.';
+    toolType = 'PowerPlatform Dataverse Agent';
+  }
+  
+  document.getElementById('modalDesc').innerText = desc;
+  document.getElementById('modalToolName').innerText = toolName;
+  document.getElementById('modalToolDesc').innerText = toolDesc;
+  document.getElementById('modalToolType').innerText = toolType;
+  
+  // Dynamic permissions list
+  var permHtml = '';
+  if (agentData.name.toLowerCase().indexOf('canva') !== -1) {
+    permHtml += '<tr><td>Contacts.Read</td><td>Allows the app to read user contacts</td><td>Delegiert</td><td><div class="permission-bar-container"><div class="permission-bar filled-low"></div><div class="permission-bar"></div><div class="permission-bar"></div></div></td></tr>';
+    permHtml += '<tr><td>email</td><td>Allows the app to read users primary email address</td><td>Delegiert</td><td><div class="permission-bar-container"><div class="permission-bar filled-low"></div><div class="permission-bar"></div><div class="permission-bar"></div></div></td></tr>';
+    permHtml += '<tr><td>Files.ReadWrite.All</td><td>Allows read/write access to all user files</td><td>Delegiert</td><td><div class="permission-bar-container"><div class="permission-bar filled-high"></div><div class="permission-bar filled-high"></div><div class="permission-bar filled-high"></div></div></td></tr>';
+    permHtml += '<tr><td>Sites.ReadWrite.All</td><td>Allows edit or delete access to SharePoint site collections</td><td>Delegiert</td><td><div class="permission-bar-container"><div class="permission-bar filled-high"></div><div class="permission-bar filled-high"></div><div class="permission-bar filled-high"></div></div></td></tr>';
+  } else {
+    permHtml += '<tr><td>User.Read</td><td>Read user profile information</td><td>Delegiert</td><td><div class="permission-bar-container"><div class="permission-bar filled-low"></div><div class="permission-bar"></div><div class="permission-bar"></div></div></td></tr>';
+    permHtml += '<tr><td>Directory.Read.All</td><td>Read directory data</td><td>Application</td><td><div class="permission-bar-container"><div class="permission-bar filled-high"></div><div class="permission-bar filled-high"></div><div class="permission-bar"></div></div></td></tr>';
+  }
+  document.getElementById('permissionRows').innerHTML = permHtml;
+  
+  // Show / Hide buttons based on status
+  var btnInstall = document.getElementById('btnInstall');
+  var btnBlock = document.getElementById('btnBlock');
+  if (agentData.status === 'Verfügbar' || agentData.status === 'Available' || agentData.status === 'Blocked' || agentData.status === 'Blockiert' || agentData.status === 'Disabled') {
+    if (agentData.status === 'Blocked' || agentData.status === 'Blockiert' || agentData.status === 'Disabled') {
+      btnInstall.querySelector('span').innerText = 'Aktivieren';
+      btnInstall.style.display = 'block';
+      btnBlock.style.display = 'none';
+    } else {
+      btnInstall.querySelector('span').innerText = 'Installieren';
+      btnInstall.style.display = 'block';
+      btnBlock.style.display = 'none';
+    }
+  } else {
+    btnInstall.style.display = 'none';
+    btnBlock.style.display = 'block';
+  }
+  
+  // Reset tabs
+  var tabs = document.querySelectorAll('.modal-tab');
+  tabs.forEach(function(t) { t.classList.remove('active'); });
+  tabs[0].classList.add('active');
+  
+  var contents = document.querySelectorAll('.modal-tab-content');
+  contents.forEach(function(c) { c.classList.remove('active'); });
+  document.getElementById('tab-details').classList.add('active');
+
+  document.getElementById('modalBackdrop').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalBackdrop').classList.remove('open');
+}
+
+async function triggerModalAction(actionType) {
+  if (!currentAgentData) return;
+  const agentName = currentAgentData.name;
+  
+  const repo = localStorage.getItem('grc_repo');
+  const token = localStorage.getItem('grc_token');
+  const branch = localStorage.getItem('grc_branch') || 'main';
+  
+  if (!repo || !token) {
+    alert('Bitte konfiguriere zuerst dein GitHub-Repository und dein GitHub-Token auf der Config-Seite.');
+    window.location.href = '../config/';
+    return;
+  }
+  
+  const initiatorUpn = localStorage.getItem('grc_user_upn') || 'micha@compliance-services.de';
+  
+  let actionText = actionType === 'block' ? 'blockieren' : (actionType === 'install' ? 'installieren' : 'aktivieren');
+  if (confirm('Möchtest du den Agenten "' + agentName + '" wirklich ' + actionText + '?')) {
+    try {
+      const path = '/repos/' + repo + '/actions/workflows/60-agent-status-action.yml/dispatches';
+      const response = await fetch('https://api.github.com' + path, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/vnd.github+json',
+          'Authorization': 'Bearer ' + token,
+          'X-GitHub-Api-Version': '2022-11-28'
+        },
+        body: JSON.stringify({
+          ref: branch,
+          inputs: {
+            targetId: agentName,
+            action: actionType,
+            initiatorUpn: initiatorUpn,
+            dryRun: 'false'
+          }
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+      
+      alert('Erfolgreich! Der GitHub-Workflow "60 - Agent Status Action" wurde gestartet, um den Agenten "' + agentName + '" zu ' + actionText + '. (Hinweis: Die Freigabe erfordert ggf. eine manuelle Bestätigung im Workflow)');
+      closeModal();
+    } catch (e) {
+      alert('Fehler beim Starten des Workflows: ' + e.message);
+    }
+  }
+}
+
+async function triggerBillingAction(planName) {
+  const repo = localStorage.getItem('grc_repo');
+  const token = localStorage.getItem('grc_token');
+  const branch = localStorage.getItem('grc_branch') || 'main';
+  
+  if (!repo || !token) {
+    alert('Bitte konfiguriere zuerst dein GitHub-Repository und dein GitHub-Token auf der Config-Seite.');
+    window.location.href = '../config/';
+    return;
+  }
+  
+  const limitValue = prompt('Gib das neue Budgetlimit für den Abrechnungsplan "' + planName + '" in EUR ein:', "1000");
+  if (limitValue === null) return;
+  
+  const initiatorUpn = localStorage.getItem('grc_user_upn') || 'micha@compliance-services.de';
+  
+  if (confirm('Möchtest du das Budget für "' + planName + '" wirklich auf ' + limitValue + ' EUR anpassen?')) {
+    try {
+      const path = '/repos/' + repo + '/actions/workflows/70-billing-change-action.yml/dispatches';
+      const response = await fetch('https://api.github.com' + path, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/vnd.github+json',
+          'Authorization': 'Bearer ' + token,
+          'X-GitHub-Api-Version': '2022-11-28'
+        },
+        body: JSON.stringify({
+          ref: branch,
+          inputs: {
+            targetId: planName,
+            action: 'budget-change',
+            budgetLimit: limitValue,
+            initiatorUpn: initiatorUpn,
+            dryRun: 'false'
+          }
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+      
+      alert('Erfolgreich! Der GitHub-Workflow "70 - Billing Change Action" wurde gestartet, um das Budget für "' + planName + '" auf ' + limitValue + ' EUR anzupassen.');
+      closeBillingModal();
+    } catch (e) {
+      alert('Fehler beim Starten des Workflows: ' + e.message);
+    }
+  }
+}
+
+function switchTab(evt, tabName) {
+  var tabs = document.querySelectorAll('.modal-tab');
+  tabs.forEach(function(t) { t.classList.remove('active'); });
+  evt.currentTarget.classList.add('active');
+  
+  var contents = document.querySelectorAll('.modal-tab-content');
+  contents.forEach(function(c) { c.classList.remove('active'); });
+  document.getElementById('tab-' + tabName).classList.add('active');
+}
+
+function openBillingModal(data) {
+  document.getElementById('billingModalName').innerText = data.name || 'Abrechnungsplan';
+  document.getElementById('billingPlanName').innerText = data.name || '-';
+  document.getElementById('billingAzureSub').innerText = data.subscription || '-';
+  document.getElementById('billingResourceGroup').innerText = data.rg || '-';
+  
+  var region = 'Deutschland';
+  if (data.name && data.name.toLowerCase().indexOf('global') !== -1) { region = 'Europa (West)'; }
+  document.getElementById('billingRegion').innerText = region;
+
+  var tabs = document.querySelectorAll('#billingModalBackdrop .modal-tab');
+  tabs.forEach(function(t) { t.classList.remove('active'); });
+  tabs[0].classList.add('active');
+  
+  var contents = document.querySelectorAll('#billingModalBackdrop .modal-tab-content');
+  contents.forEach(function(c) { c.classList.remove('active'); });
+  document.getElementById('tab-billing-details').classList.add('active');
+
+  document.getElementById('billingModalBackdrop').classList.add('open');
+}
+
+function closeBillingModal() {
+  document.getElementById('billingModalBackdrop').classList.remove('open');
+}
+
+function switchBillingTab(evt, tabName) {
+  var tabs = document.querySelectorAll('#billingModalBackdrop .modal-tab');
+  tabs.forEach(function(t) { t.classList.remove('active'); });
+  evt.currentTarget.classList.add('active');
+  
+  var contents = document.querySelectorAll('#billingModalBackdrop .modal-tab-content');
+  contents.forEach(function(c) { c.classList.remove('active'); });
+  document.getElementById('tab-' + tabName).classList.add('active');
+}
+
+function onGlobalSearch() {
+  var query = document.getElementById('globalSearch').value.toLowerCase();
+  var tables = document.querySelectorAll('.main-content-wrapper table');
+  tables.forEach(function(table) {
+    var rows = table.querySelectorAll('tbody tr');
+    rows.forEach(function(row) {
+      if (row.cells.length > 0 && !row.cells[0].classList.contains('empty')) {
+        var text = row.innerText.toLowerCase();
+        if (text.indexOf(query) > -1) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      }
+    });
+  });
+}
+
+var sortDirections = {};
+function sortTable(tableIndex, colIndex) {
+  var tables = document.querySelectorAll('.main-content-wrapper table');
+  if (tableIndex >= tables.length) return;
+  var table = tables[tableIndex];
+  var tbody = table.querySelector('tbody');
+  var rows = Array.from(tbody.querySelectorAll('tr'));
+  if (rows.length === 0 || rows[0].cells.length <= colIndex) return;
+  if (rows[0].cells[0].getAttribute('colspan')) return; // empty row
+  
+  var key = tableIndex + '-' + colIndex;
+  var dir = sortDirections[key] === 'asc' ? 'desc' : 'asc';
+  sortDirections[key] = dir;
+  
+  rows.sort(function(a, b) {
+    if (a.cells.length <= colIndex || b.cells.length <= colIndex) return 0;
+    var cellA = a.cells[colIndex].innerText.trim();
+    var cellB = b.cells[colIndex].innerText.trim();
+    
+    var valA = isNaN(cellA.replace(' €','').replace('%','').trim()) ? cellA.toLowerCase() : parseFloat(cellA);
+    var valB = isNaN(cellB.replace(' €','').replace('%','').trim()) ? cellB.toLowerCase() : parseFloat(cellB);
+    
+    if (valA < valB) return dir === 'asc' ? -1 : 1;
+    if (valA > valB) return dir === 'asc' ? 1 : -1;
+    return 0;
+  });
+  
+  tbody.innerHTML = '';
+  rows.forEach(function(row) { tbody.appendChild(row); });
+  
+  var headers = table.querySelectorAll('thead th');
+  headers.forEach(function(th, idx) {
+    var text = th.innerText.replace(' ▲', '').replace(' ▼', '').replace(' ↕', '');
+    if (idx === colIndex) {
+      th.innerHTML = text + (dir === 'asc' ? ' ▲' : ' ▼');
+    } else if (th.style.cursor === 'pointer') {
+      th.innerHTML = text + ' ↕';
+    }
+  });
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.body.addEventListener('click', function(e) {
+    var link = e.target.closest('.agent-link');
+    if (link) {
+      e.preventDefault();
+      var data = {
+        name: link.getAttribute('data-name'),
+        owner: link.getAttribute('data-owner'),
+        status: link.getAttribute('data-status'),
+        risk: link.getAttribute('data-risk'),
+        source: link.getAttribute('data-source'),
+        appid: link.getAttribute('data-appid'),
+        action: link.getAttribute('data-action')
+      };
+      openModal(data);
+    }
+    
+    var billingLink = e.target.closest('.billing-link, .billing-btn');
+    if (billingLink) {
+      e.preventDefault();
+      var data = {
+        name: billingLink.getAttribute('data-name'),
+        subscription: billingLink.getAttribute('data-subscription'),
+        rg: billingLink.getAttribute('data-rg')
+      };
+      openBillingModal(data);
+    }
+  });
+  // Check auth UPN display
+  const upn = localStorage.getItem('grc_user_upn');
+  const name = localStorage.getItem('grc_user_name');
+  if (upn) {
+    const avatar = document.querySelector('.profile-avatar-mock');
+    if (avatar) {
+      avatar.innerText = upn.substring(0, 2).toUpperCase();
+      avatar.title = name + " (" + upn + ")";
+    }
+  }
+});
+
+// MSAL Configuration
+const msalConfig = {
+  auth: {
+    clientId: "" || localStorage.getItem('grc_reader_client_id') || "",
+    authority: "https://login.microsoftonline.com/" + ("" || "common"),
+    redirectUri: window.location.origin + window.location.pathname
+  },
+  cache: {
+    cacheLocation: "sessionStorage",
+    storeAuthStateInCookie: false
+  }
+};
+
+let msalInstance = null;
+
+function initAuth() {
+  const loadingState = document.getElementById('loginLoadingState');
+  const promptSection = document.getElementById('loginPromptSection');
+  const errorMsg = document.getElementById('loginErrorMessage');
+  const manualLink = document.getElementById('manualIdLink');
+  
+  if (!msalConfig.auth.clientId) {
+    if (loadingState) loadingState.style.display = 'none';
+    errorMsg.innerText = "Konfigurationsfehler: Die Client-ID für die Reader-App (vars.CAG_READER_CLIENT_ID) wurde in GitHub nicht gefunden oder ist leer.";
+    errorMsg.style.display = 'block';
+    if (manualLink) manualLink.style.display = 'inline-block';
+    return;
+  }
+  
+  try {
+    if (typeof msal === 'undefined') {
+      throw new Error("Das MSAL.js SDK konnte nicht geladen werden (möglicherweise blockiert ein AdBlocker oder eine Firewall CDN-Verbindungen).");
+    }
+    
+    msalInstance = new msal.PublicClientApplication(msalConfig);
+    msalInstance.handleRedirectPromise().then(response => {
+      if (response !== null) {
+        localStorage.setItem('grc_user_upn', response.account.username);
+        localStorage.setItem('grc_user_name', response.account.name);
+        showAppContent();
+      } else {
+        checkAuth();
+      }
+    }).catch(error => {
+      console.error(error);
+      if (loadingState) loadingState.style.display = 'none';
+      errorMsg.innerText = "Fehler bei Authentifizierung: " + error.message;
+      errorMsg.style.display = 'block';
+      if (promptSection) promptSection.style.display = 'block';
+      if (manualLink) manualLink.style.display = 'inline-block';
+    });
+  } catch (e) {
+    console.error("MSAL initialization failed", e);
+    if (loadingState) loadingState.style.display = 'none';
+    errorMsg.innerText = "MSAL-Fehler bei Initialisierung: " + e.message;
+    errorMsg.style.display = 'block';
+    if (manualLink) manualLink.style.display = 'inline-block';
+  }
+}
+
+function checkAuth() {
+  const loadingState = document.getElementById('loginLoadingState');
+  const promptSection = document.getElementById('loginPromptSection');
+  const manualLink = document.getElementById('manualIdLink');
+  
+  if (!msalInstance) return;
+  const accounts = msalInstance.getAllAccounts();
+  if (accounts.length === 0) {
+    if (loadingState) loadingState.style.display = 'none';
+    if (promptSection) promptSection.style.display = 'block';
+    if (manualLink) manualLink.style.display = 'inline-block';
+  } else {
+    localStorage.setItem('grc_user_upn', accounts[0].username);
+    localStorage.setItem('grc_user_name', accounts[0].name);
+    showAppContent();
+  }
+}
+
+function login() {
+  const customId = document.getElementById('customClientId') ? document.getElementById('customClientId').value.trim() : null;
+  if (customId) {
+    localStorage.setItem('grc_reader_client_id', customId);
+    msalConfig.auth.clientId = customId;
+    initAuth();
+    return;
+  }
+  
+  if (!msalConfig.auth.clientId) {
+    alert("Bitte trage eine gültige Client ID (App Registration ID) ein.");
+    return;
+  }
+  
+  msalInstance.loginRedirect({
+    scopes: ["User.Read"]
+  });
+}
+
+function toggleManualId() {
+  const section = document.getElementById('clientIdConfigSection');
+  if (section.style.display === 'none') {
+    section.style.display = 'block';
+    document.getElementById('loginErrorMessage').style.display = 'none';
+    document.getElementById('loginButton').style.display = 'block';
+  } else {
+    section.style.display = 'none';
+  }
+}
+
+function showAppContent() {
+  document.querySelector('.app').style.display = 'flex';
+  document.getElementById('loginLockScreen').style.display = 'none';
+  
+  const upn = localStorage.getItem('grc_user_upn');
+  const name = localStorage.getItem('grc_user_name');
+  if (upn) {
+    const avatar = document.querySelector('.profile-avatar-mock');
+    if (avatar) {
+      let initials = "AD";
+      if (name) {
+        const parts = name.split(' ');
+        if (parts.length >= 2) {
+          initials = (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        } else if (name.length >= 2) {
+          initials = name.substring(0, 2).toUpperCase();
+        }
+      } else if (upn) {
+        initials = upn.substring(0, 2).toUpperCase();
+      }
+      avatar.innerText = initials;
+      avatar.title = name + " (" + upn + ")";
+    }
+    
+    const dName = document.getElementById('profileUserName');
+    if (dName) dName.innerText = name || "Angemeldet";
+    const dEmail = document.getElementById('profileUserEmail');
+    if (dEmail) dEmail.innerText = upn || "";
+  }
+}
+
+function toggleProfileDropdown() {
+  const dropdown = document.getElementById('profileDropdown');
+  if (dropdown) {
+    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+  }
+}
+
+function logout() {
+  localStorage.removeItem('grc_user_upn');
+  localStorage.removeItem('grc_user_name');
+  if (msalInstance) {
+    msalInstance.logoutRedirect();
+  } else {
+    window.location.reload();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initAuth();
+});
+
+document.addEventListener('click', function(e) {
+  const container = document.querySelector('.profile-menu-container');
+  const dropdown = document.getElementById('profileDropdown');
+  if (dropdown && container && !container.contains(e.target)) {
+    dropdown.style.display = 'none';
+  }
+});
+</script>
+
+<div id="loginLockScreen" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#0f172a; color:white; align-items:center; justify-content:center; flex-direction:column; z-index:99999; font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <div style="background:#1e293b; padding:40px; border-radius:12px; box-shadow:0 10px 25px -5px rgba(0,0,0,0.3); border:1px solid #334155; text-align:center; max-width:420px; width:90%;">
+    <div style="font-size:48px; margin-bottom:20px;">🛡️</div>
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:12px; color:#ffffff;">Agent GRC</h2>
+    
+    <div id="loginLoadingState" style="margin-bottom:20px; color:#94a3b8; font-size:14px;">
+      <div style="display:inline-block; width:24px; height:24px; border:3px solid rgba(255,255,255,0.3); border-radius:50%; border-top-color:#fff; animation:spin 1s ease-in-out infinite; margin-bottom:12px;"></div>
+      <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+      <div>Sicherheitsprüfung wird geladen...</div>
+    </div>
+
+    <div id="loginPromptSection" style="display:none;">
+      <p style="color:#94a3b8; font-size:14px; margin-bottom:24px; line-height:1.5;">Bitte melde dich mit deinem Microsoft 365 Unternehmenskonto an, um das Governance-Dashboard anzuzeigen.</p>
+      <button id="loginButton" onclick="login()" style="background:#4f46e5; color:white; border:none; padding:12px 24px; font-size:15px; font-weight:600; border-radius:8px; cursor:pointer; width:100%; transition:background 0.2s; margin-bottom:16px;">Mit Microsoft 365 anmelden</button>
+    </div>
+    
+    <div id="loginErrorMessage" style="display:none; color:#f87171; font-size:13px; margin-bottom:20px; line-height:1.5; text-align:left; background:#7f1d1d; padding:12px; border-radius:6px; border:1px solid #b91c1c;"></div>
+
+    <div id="clientIdConfigSection" style="display:none; margin-bottom:20px; text-align:left; background:#0f172a; padding:16px; border-radius:8px; border:1px solid #334155;">
+      <label style="display:block; font-size:11px; font-weight:600; color:#94a3b8; margin-bottom:6px; text-transform:uppercase;">Reader Client ID erforderlich</label>
+      <input type="text" id="customClientId" placeholder="00000000-0000-0000-0000-000000000000" style="width:100%; padding:10px; background:#1e293b; border:1px solid #475569; color:white; border-radius:6px; font-size:13px; box-sizing:border-box; margin-bottom:8px;">
+      <span style="font-size:11px; color:#64748b; line-height:1.4; display:block;">Trage hier die ClientID deiner Reader-App-Registrierung aus deinem Tenant ein.</span>
+    </div>
+    
+    <a href="#" id="manualIdLink" onclick="toggleManualId(); return false;" style="color:#64748b; font-size:12px; text-decoration:underline; display:none; margin-top:12px;">Client-ID manuell konfigurieren</a>
+  </div>
+</div>
+
+</body>
+</html>

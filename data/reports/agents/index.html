@@ -1,0 +1,1815 @@
+<!doctype html>
+<html lang='de'>
+<head>
+<meta charset='utf-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>Agenten verwalten</title>
+<style>:root {
+  --blue: #4f46e5;
+  --blue-hover: #4338ca;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --bg: #f7f9fc;
+  --line: #e2e8f0;
+  --red: #ef4444;
+  --orange: #f59e0b;
+  --green: #10b981;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  background-color: #f7f9fc;
+  color: #1e293b;
+  min-height: 100vh;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 220px minmax(0,1fr);
+  min-height: 100vh;
+}
+
+/* Sidebar Layout */
+.sidebar {
+  background-color: #ffffff;
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px 16px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+}
+
+.logo-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 12px;
+  margin-bottom: 24px;
+}
+
+.sidebar-logo {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #4f46e5, #3b82f6);
+  border-radius: 8px;
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav a:hover {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+.nav a.active {
+  background-color: #eef2ff;
+  color: #4f46e5;
+  font-weight: 600;
+}
+
+.nav-logo-marker {
+  font-weight: 800;
+  font-size: 14px;
+}
+
+/* Main Area */
+.main {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.top-bar-container {
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--line);
+  padding: 16px 24px;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title h1 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.search {
+  width: 260px;
+  padding: 8px 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 13px;
+  outline: none;
+  background-color: #ffffff;
+}
+
+.select, .date-picker-mock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+  cursor: pointer;
+}
+
+.profile-avatar-mock {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #4f46e5;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.main-content-wrapper {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* KPI Summary Row */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+
+.card {
+  background-color: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.kpi-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+}
+
+.kpi-icon-wrapper.blue { background-color: #e0e7ff; color: #4f46e5; }
+.kpi-icon-wrapper.cyan { background-color: #e0f2fe; color: #0284c7; }
+.kpi-icon-wrapper.green { background-color: #dcfce7; color: #16a34a; }
+.kpi-icon-wrapper.orange { background-color: #ffedd5; color: #ea580c; }
+.kpi-icon-wrapper.red { background-color: #fee2e2; color: #dc2626; }
+
+.metric {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric span {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.metric b {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 4px 0;
+}
+
+.metric small {
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.metric small.up { color: #16a34a; }
+
+/* Grid blocks layout */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.panel {
+  background-color: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  margin-bottom: 20px;
+}
+
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.panel-head h2 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.panel-body {
+  padding: 0;
+  overflow-x: auto;
+  flex: 1;
+}
+
+.panel-body-padded {
+  padding: 20px;
+  color: #334155;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+th {
+  background-color: #fafbfc;
+  color: var(--muted);
+  font-weight: 600;
+  text-align: left;
+  padding: 10px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+td {
+  padding: 12px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  vertical-align: middle;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.badge.success { background-color: #dcfce7; color: #15803d; }
+.badge.warning { background-color: #fef3c7; color: #b45309; }
+.badge.danger { background-color: #fee2e2; color: #b91c1c; }
+.badge.neutral { background-color: #e2e8f0; color: #334155; }
+
+/* Action buttons */
+.btn-action {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background-color: #ffffff;
+  border: 1px solid var(--line);
+  display: inline-block;
+  text-align: center;
+}
+
+.btn-action.blue { border-color: #bfdbfe; color: #2563eb; }
+.btn-action.blue:hover { background-color: #eff6ff; }
+.btn-action.red { border-color: #fca5a5; color: #dc2626; }
+.btn-action.red:hover { background-color: #fef2f2; }
+.btn-action.solid-red { background-color: #ef4444; border-color: #ef4444; color: #ffffff; }
+.btn-action.solid-red:hover { background-color: #dc2626; }
+
+/* Footer style */
+.block-footer {
+  padding: 12px 20px;
+  background-color: #fafbfc;
+  border-top: 1px solid #f1f5f9;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.footer-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.footer-card {
+  background-color: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 11px;
+  color: #475569;
+}
+
+.footer-card .highlight {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.footer-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-footer {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  background-color: #ffffff;
+  border: 1px solid var(--line);
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-footer:hover { background-color: #f1f5f9; color: #0f172a; }
+.btn-footer.primary { background-color: #4f46e5; border-color: #4f46e5; color: #ffffff; }
+.btn-footer.primary:hover { background-color: #4338ca; }
+
+.footer-text {
+  font-size: 11px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.notice {
+  border: 1px solid #bfdbfe;
+  background-color: #eff6ff;
+  color: #1e40af;
+  border-radius: 12px;
+  padding: 16px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+/* Config page specifics */
+.config-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  padding: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.field label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.field input {
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 13px;
+  outline: none;
+  background-color: #ffffff;
+  transition: border-color 0.15s ease;
+}
+
+.field input:focus {
+  border-color: #a5b4fc;
+}
+
+/* Right-side measures panel */
+.sidepanel {
+  background-color: #ffffff;
+  border-left: 1px solid var(--line);
+  padding: 24px 16px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sidepanel h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 12px;
+}
+
+.count-badge {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #ef4444;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+
+.action-card {
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background-color: #fafbfc;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.action-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  background-color: #ffffff;
+  border-color: var(--line);
+}
+
+.action-num {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.action-num.red { background-color: #ef4444; }
+.action-num.orange { background-color: #f59e0b; }
+.action-num.yellow { background-color: #eab308; }
+.action-num.green { background-color: #10b981; }
+
+.chev {
+  color: #94a3b8;
+  font-size: 16px;
+  align-self: center;
+}
+
+/* Custom styles for sparkline representation */
+.sparkline-container {
+  display: flex;
+  align-items: center;
+  width: 60px;
+  height: 20px;
+}
+
+.sparkline-svg {
+  width: 100%;
+  height: 100%;
+  stroke: #4f46e5;
+  stroke-width: 1.5;
+  fill: none;
+}
+
+/* Modal Backdrop & Drawer */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.4);
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
+}
+.modal-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.modal-drawer {
+  position: fixed;
+  top: 0;
+  right: -600px;
+  width: 600px;
+  height: 100vh;
+  background: #ffffff;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  transition: right 0.2s ease-in-out;
+}
+.modal-backdrop.open .modal-drawer {
+  right: 0;
+}
+.modal-header {
+  padding: 24px;
+  border-bottom: 1px solid #e2e8f0;
+  position: relative;
+}
+.modal-close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  font-size: 20px;
+  cursor: pointer;
+  color: #64748b;
+  border: none;
+  background: none;
+  z-index: 50;
+}
+.modal-close:hover {
+  color: #0f172a;
+}
+.modal-title-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.modal-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+.modal-title-info h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+}
+.modal-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 4px;
+}
+.modal-badge.success { background: #dcfce7; color: #166534; }
+.modal-badge.warning { background: #fef9c3; color: #854d0e; }
+.modal-badge.danger { background: #fee2e2; color: #991b1b; }
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.modal-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.modal-btn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+.modal-btn.primary {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+}
+.modal-btn.primary:hover {
+  background: #1e293b;
+}
+.modal-btn.danger {
+  color: #dc2626;
+  border-color: #fca5a5;
+  background: #fef2f2;
+}
+.modal-btn.danger:hover {
+  background: #fee2e2;
+}
+.modal-tabs {
+  display: flex;
+  gap: 16px;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0 24px;
+  background: #f8fafc;
+}
+.modal-tab {
+  padding: 12px 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+.modal-tab.active {
+  color: #4f46e5;
+  border-bottom-color: #4f46e5;
+}
+.modal-body {
+  padding: 24px;
+  flex: 1;
+  overflow-y: auto;
+}
+.modal-tab-content {
+  display: none;
+}
+.modal-tab-content.active {
+  display: block;
+}
+.modal-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+.modal-info-item {
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #f1f5f9;
+}
+.modal-info-item label {
+  display: block;
+  font-size: 11px;
+  color: #64748b;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+.modal-info-item span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+}
+.permission-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+.permission-table th, .permission-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 12px;
+}
+.permission-table th {
+  font-weight: 600;
+  color: #475569;
+  background: #f8fafc;
+}
+.permission-bar-container {
+  display: flex;
+  gap: 2px;
+}
+.permission-bar {
+  width: 8px;
+  height: 12px;
+  border-radius: 1px;
+  background: #cbd5e1;
+}
+.permission-bar.filled-low { background: #3b82f6; }
+.permission-bar.filled-high { background: #ef4444; }
+
+@media (max-width: 1400px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 1200px) {
+  .app {
+    grid-template-columns: 220px minmax(0,1fr);
+  }
+  .sidepanel {
+    display: none;
+  }
+}</style>
+<script src="../assets/vendor/msal-browser.min.js"></script>
+</head>
+<body>
+<div class='app' style='display:none;'>
+  <aside class='sidebar'>
+    <div>
+      <div class='logo-row'>
+        <div class='sidebar-logo'></div>
+        <span style='font-weight:700; font-size:16px; color:#0f172a;'>Agent GRC</span>
+      </div>
+      <nav class='nav'><a class='' href='../dashboard/' style='display:flex; align-items:center; gap:10px;'><span style='font-size:16px;'>🏠</span> Übersicht</a>
+<a class='active' href='../agents/' style='display:flex; align-items:center; gap:10px;'><span style='font-size:16px;'>🤖</span> Agenten</a>
+<a class='' href='../reports/#verbrauch' style='display:flex; align-items:center; gap:10px;'><span style='font-size:16px;'>📊</span> Verbrauch</a>
+<a class='' href='../governance/' style='display:flex; align-items:center; gap:10px;'><span style='font-size:16px;'>🛡️</span> Governance</a>
+<a class='' href='../costs/' style='display:flex; align-items:center; gap:10px;'><span style='font-size:16px;'>💶</span> Kosten</a>
+<a class='' href='../actions/' style='display:flex; align-items:center; gap:10px;'><span style='font-size:16px;'>⚡</span> Aktionen</a>
+<a class='' href='../reports/' style='display:flex; align-items:center; gap:10px;'><span style='font-size:16px;'>📄</span> Berichte</a>
+<a class='' href='../config/' style='display:flex; align-items:center; gap:10px;'><span style='font-size:16px;'>⚙️</span> Config</a></nav>
+    </div>
+    <div style='border-top:1px solid #e2e8f0; padding-top:16px;'>
+      <a href='#minimize' class='sidebar-item' style='display:flex; align-items:center; gap:12px; padding:12px 16px; color:#64748b; font-size:14px; text-decoration:none;'>
+        <span>&lt; Menü minimieren</span>
+      </a>
+    </div>
+  </aside>
+  <main class='main'>
+    <div class='top-bar-container'>
+      <div class='top'>
+        <div class='title'><h1>Agenten verwalten</h1><p class='subtitle'>Live-Auflistung und Governance-Verwaltung</p></div>
+        <div class='tools'>
+          <input class='search' id='globalSearch' onkeyup='onGlobalSearch()' placeholder='Suche nach Agenten, Ownern, Services...'>
+          <div class='date-picker-mock'>01.05.2025 – 31.05.2025</div>
+          <div class='select'>Prod</div>
+          <div class='profile-menu-container' style='position:relative; display:inline-block;'>
+            <div class='profile-avatar-mock' onclick='toggleProfileDropdown()' style='cursor:pointer;'>AD</div>
+            <div id='profileDropdown' style='display:none; position:absolute; right:0; top:45px; background:white; border:1px solid #e2e8f0; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.15); width:220px; z-index:99999; padding:16px; text-align:left;'>
+              <div style='font-size:13px; font-weight:600; color:#0f172a; margin-bottom:4px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;' id='profileUserName'>Angemeldet</div>
+              <div style='font-size:11px; color:#64748b; margin-bottom:12px; word-break:break-all; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;' id='profileUserEmail'>-</div>
+              <hr style='border:0; border-top:1px solid #e2e8f0; margin:8px 0;'>
+              <a href='#' onclick='logout(); return false;' style='display:block; text-decoration:none; color:#dc2626; font-size:12px; font-weight:600; padding:4px 0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;'>Konto wechseln / abmelden</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='main-content-wrapper'>
+      
+      <div class='notice'>Agenten-Seite für Auflistung, Registrierung und Verwaltung. Es werden nur live erkannte App-/Service-Principal-Kandidaten angezeigt. Keine Demo-Agenten.</div>
+<section class='panel'>
+  <div class='panel-head'><h2>Live Agent/App Inventory</h2><span class='badge neutral'>222 Einträge</span></div>
+  <div class='panel-body'>
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sortTable(0, 0)" style="cursor:pointer;">Agent/App-Kandidat ↕</th>
+          <th onclick="sortTable(0, 1)" style="cursor:pointer;">Owner ↕</th>
+          <th onclick="sortTable(0, 2)" style="cursor:pointer;">Status ↕</th>
+          <th onclick="sortTable(0, 3)" style="cursor:pointer;">Kanal ↕</th>
+          <th onclick="sortTable(0, 4)" style="cursor:pointer;">Risiko ↕</th>
+          <th>Aktion</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Test Agent 01' data-owner='Michael Kirst-Neshva' data-status='Aktiv' data-risk='Niedrig' data-source='Copilot Studio' data-appid='' data-action='Review' data-channel='M365'>Test Agent 01</a></td><td>Michael Kirst-Neshva</td><td><span class='badge success'>Aktiv</span></td><td>M365</td><td><span class='badge success'>Niedrig</span></td><td><button class='btn-action blue'>Review</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='NIST 800-171 Assister' data-owner='Michael Kirst-Neshva' data-status='Aktiv' data-risk='Niedrig' data-source='M365 Copilot-Agent Builder' data-appid='' data-action='Review' data-channel='M365'>NIST 800-171 Assister</a></td><td>Michael Kirst-Neshva</td><td><span class='badge success'>Aktiv</span></td><td>M365</td><td><span class='badge success'>Niedrig</span></td><td><button class='btn-action blue'>Review</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Label Audit Dokumen' data-owner='Michael Kirst-Neshva' data-status='Aktiv' data-risk='Niedrig' data-source='Copilot Studio' data-appid='' data-action='Review' data-channel='M365'>Label Audit Dokumen</a></td><td>Michael Kirst-Neshva</td><td><span class='badge success'>Aktiv</span></td><td>M365</td><td><span class='badge success'>Niedrig</span></td><td><button class='btn-action blue'>Review</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='HubSpot' data-owner='HubSpot Inc' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_8b903348-ed85-feba-ec71-6812954f69e2' data-action='Blockieren' data-channel='Teams;Outlook;Copilot'>HubSpot</a></td><td>HubSpot Inc</td><td><span class='badge success'>Available</span></td><td>Teams;Outlook;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Canva.' data-owner='Canva Pty Ltd' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_dc7ff5c3-a585-8075-d148-1199548a7529' data-action='Blockieren' data-channel='Teams;Outlook;Copilot'>Canva.</a></td><td>Canva Pty Ltd</td><td><span class='badge success'>Available</span></td><td>Teams;Outlook;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Adobe Acrobat for Microsoft Teams, Outlook, and Copilot' data-owner='ADOBE INC.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_95ececa2-8770-8e92-fd40-8983e3c2adab' data-action='Blockieren' data-channel='Teams;Copilot;Outlook;Office'>Adobe Acrobat for Microsoft Teams, Outlook, and Copilot</a></td><td>ADOBE INC.</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot;Outlook;Office</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='SideKick - CoPilot' data-owner='XOPS' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_dbd9caf8-8408-b176-1e0c-b99401d5dcb7' data-action='Blockieren' data-channel='Copilot'>SideKick - CoPilot</a></td><td>XOPS</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Sales' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_280ba0c3-7951-e7a8-68d3-8d65f9ca8149' data-action='Blockieren' data-channel='Copilot;Outlook;Teams;Office'>Sales</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot;Outlook;Teams;Office</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='LegalZoom' data-owner='LegalZoom.com Inc' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_1c65252e-71e9-7512-2ad8-e4a3ddabf621' data-action='Blockieren' data-channel='Copilot'>LegalZoom</a></td><td>LegalZoom.com Inc</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Box' data-owner='Box.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_fbba5986-55ec-2828-4124-e068a42cbf57' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>Box</a></td><td>Box.</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Datasite Copilot Agent' data-owner='Datasite Global Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_ffa967c5-7580-3118-f510-b87c3b443cbe' data-action='Blockieren' data-channel='Copilot'>Datasite Copilot Agent</a></td><td>Datasite Global Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Asana' data-owner='Asana' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_c49f86f4-c199-cbfa-0984-905ba9220738' data-action='Blockieren' data-channel='Outlook;Teams;Copilot'>Asana</a></td><td>Asana</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='LawToolBox' data-owner='LawToolBox.com Inc.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_452a7b60-0181-2a3b-8523-d1c1c5339541' data-action='Blockieren' data-channel='Outlook;Teams;Office;Copilot'>LawToolBox</a></td><td>LawToolBox.com Inc.</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Office;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Miro' data-owner='Miro' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_3b7af06c-492d-bc33-166d-852e51b91961' data-action='Blockieren' data-channel='Outlook;Teams;Copilot'>Miro</a></td><td>Miro</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='monday.com' data-owner='monday.com ltd' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_5abac949-11a6-cca6-9f70-8f47520ed97f' data-action='Blockieren' data-channel='Outlook;Teams;Office;Copilot'>monday.com</a></td><td>monday.com ltd</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Office;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Fusion™ EXECUTIVE EDGE' data-owner='The Fusion Syndicate' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_b35428a0-993b-1b79-97bc-901732a24ee6' data-action='Blockieren' data-channel='Copilot'>Fusion™ EXECUTIVE EDGE</a></td><td>The Fusion Syndicate</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='SkyWatch' data-owner='SkyWatch' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_a46d5ac8-1d92-dc30-b1f4-6bc823372a79' data-action='Blockieren' data-channel='Copilot'>SkyWatch</a></td><td>SkyWatch</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Loopio (EU)' data-owner='Loopio' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_11adfa4e-d7de-6251-3d07-c62bbd64e453' data-action='Blockieren' data-channel='Teams;Outlook;Copilot'>Loopio (EU)</a></td><td>Loopio</td><td><span class='badge success'>Available</span></td><td>Teams;Outlook;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Flinq' data-owner='Flinq' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_6bd9cf23-7bec-bad8-ca54-0538b59819e5' data-action='Blockieren' data-channel='Copilot'>Flinq</a></td><td>Flinq</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Paremy' data-owner='Paremy Sp. z o.o.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_89995505-ba86-3626-304f-47849ef9f760' data-action='Blockieren' data-channel='Copilot'>Paremy</a></td><td>Paremy Sp. z o.o.</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Monday Morning Agent' data-owner='MAQ LLC' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_356b8e42-a08c-2404-e43f-7007148b779c' data-action='Blockieren' data-channel='Teams;Copilot'>Monday Morning Agent</a></td><td>MAQ LLC</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Loopio Copilot Agent-Legacy EU' data-owner='Loopio' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_0b170893-ed10-94b2-3bbb-6347f0f1f600' data-action='Blockieren' data-channel='Copilot'>Loopio Copilot Agent-Legacy EU</a></td><td>Loopio</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Diagram Maker Pro' data-owner='Witivio' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_945a9ea3-3475-9cb0-d057-75cfae8aed5d' data-action='Blockieren' data-channel='Copilot'>Diagram Maker Pro</a></td><td>Witivio</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Factorial One' data-owner='Everyday Software, S.L.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_d8c4c2ae-24dc-15aa-d88b-0cc49ca25f80' data-action='Blockieren' data-channel='Copilot;Teams'>Factorial One</a></td><td>Everyday Software, S.L.</td><td><span class='badge success'>Available</span></td><td>Copilot;Teams</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Adobe Express' data-owner='ADOBE INC.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_307475bf-b2cf-94d8-95c4-9bc732fdbc72' data-action='Blockieren' data-channel='Copilot'>Adobe Express</a></td><td>ADOBE INC.</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Merchant QBR AutoPilot' data-owner='IntelliThing' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_492f4d5a-1e12-334d-b5c9-c7a564491cb0' data-action='Blockieren' data-channel='Copilot'>Merchant QBR AutoPilot</a></td><td>IntelliThing</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Move Work Forward with Jira' data-owner='Move Work Forward Pte Ltd' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_c1f57670-e931-82fc-b95a-8e38638bd0d4' data-action='Blockieren' data-channel='Outlook;Teams;Copilot'>Move Work Forward with Jira</a></td><td>Move Work Forward Pte Ltd</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Mail Pro' data-owner='Witivio' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_c26b71ca-35d9-0329-aeec-b814838c3cd6' data-action='Blockieren' data-channel='Copilot'>Mail Pro</a></td><td>Witivio</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Anyword' data-owner='Anyword' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_56e10516-fd58-a05a-9502-43bfe9976f2a' data-action='Blockieren' data-channel='Copilot'>Anyword</a></td><td>Anyword</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Manager Insights Pro' data-owner='Witivio' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_c12fe216-6f88-d2a0-eb26-bc2345ec7a79' data-action='Blockieren' data-channel='Copilot'>Manager Insights Pro</a></td><td>Witivio</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='OrbitShift' data-owner='ORBITSHIFT INC' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_1cf04c0e-94ab-3146-c5b0-7a703f54433b' data-action='Blockieren' data-channel='Teams;Copilot'>OrbitShift</a></td><td>ORBITSHIFT INC</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Sales Development (Frontier)' data-owner='Microsoft Corporation' data-status='Not activated' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_44314319-35c9-8e6c-bb0a-fae041edd5bf' data-action='Review' data-channel='Copilot'>Sales Development (Frontier)</a></td><td>Microsoft Corporation</td><td><span class='badge neutral'>Not activated</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action blue'>Review</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Study and Learn' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_59da6362-a633-89ba-9eaa-9e86fad68dc2' data-action='Blockieren' data-channel='Copilot'>Study and Learn</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Researcher' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_552e6eda-fc18-7fb9-0ef6-1bf2de3393e4' data-action='Blockieren' data-channel='Copilot'>Researcher</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Workforce Insights (Frontier)' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_cee13b52-3ca2-f561-866d-5f91fdbf6689' data-action='Blockieren' data-channel='Copilot'>Workforce Insights (Frontier)</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Achievers' data-owner='Achievers' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_1a4bff3e-7f54-4396-cf9d-20948af4c309' data-action='Blockieren' data-channel='Copilot;Office;Outlook;Teams'>Achievers</a></td><td>Achievers</td><td><span class='badge success'>Available</span></td><td>Copilot;Office;Outlook;Teams</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Service' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_deddb90f-f59a-782a-54f3-ae378aea227a' data-action='Blockieren' data-channel='Copilot;Outlook;Teams;Office'>Service</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot;Outlook;Teams;Office</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='SwiftAssess Co-Assist' data-owner='Gamma Computers' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_dd7b4240-7e23-75ab-cea0-a9dca40135fc' data-action='Blockieren' data-channel='Teams;Copilot'>SwiftAssess Co-Assist</a></td><td>Gamma Computers</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Conductor AEO' data-owner='Conductor, Inc.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_7da060c1-104f-038e-2f77-367cc0aab95c' data-action='Blockieren' data-channel='Copilot'>Conductor AEO</a></td><td>Conductor, Inc.</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Loopio&#174;' data-owner='Loopio' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_7348f352-c98c-5ba4-3209-70957f4f75a3' data-action='Blockieren' data-channel='Teams;Outlook;Copilot'>Loopio&#174;</a></td><td>Loopio</td><td><span class='badge success'>Available</span></td><td>Teams;Outlook;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Learning' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_ad3f22f7-c966-2226-0625-5498e4ef2f73' data-action='Blockieren' data-channel='Copilot'>Learning</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Moody&#39;s Credit MCP' data-owner='Moody&#39;s MCP' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_3cb7b6f2-0b06-8686-9626-21eb51d2dbcb' data-action='Blockieren' data-channel='Copilot'>Moody&#39;s Credit MCP</a></td><td>Moody&#39;s MCP</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='LSEG Workspace' data-owner='LSEG' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_299855a9-b562-9312-a237-0e6e007358ff' data-action='Blockieren' data-channel='Teams;Outlook;Copilot;Office'>LSEG Workspace</a></td><td>LSEG</td><td><span class='badge success'>Available</span></td><td>Teams;Outlook;Copilot;Office</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Groopit Ask Anything' data-owner='Groopit' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_0c61eadc-d5f1-356e-75d0-ef86d7b9da5d' data-action='Blockieren' data-channel='Copilot'>Groopit Ask Anything</a></td><td>Groopit</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Cowork' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_04bd11c3-6ac7-7b55-6c0a-4a99918be9f1' data-action='Blockieren' data-channel='Copilot'>Cowork</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='S&amp;P Global Energy' data-owner='SPGlobal' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_31fdbc25-b134-5a57-8c3f-4bde95c7a228' data-action='Blockieren' data-channel='Copilot'>S&amp;P Global Energy</a></td><td>SPGlobal</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Harvey' data-owner='Counsel AI Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_5e538e98-37ef-2ccf-3727-db78c0ab74de' data-action='Blockieren' data-channel='Copilot'>Harvey</a></td><td>Counsel AI Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='iGlobe CRM' data-owner='iGlobe' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_4295c25c-322d-8ee4-68d5-a51e438b4fb2' data-action='Blockieren' data-channel='Copilot;Teams;Outlook;Office'>iGlobe CRM</a></td><td>iGlobe</td><td><span class='badge success'>Available</span></td><td>Copilot;Teams;Outlook;Office</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Egnyte' data-owner='Egnyte, Inc.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_029c31a4-ae1d-a29e-8d3e-24b4e932ff67' data-action='Blockieren' data-channel='Outlook;Teams;Office;Copilot'>Egnyte</a></td><td>Egnyte, Inc.</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Office;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Loopio Copilot Agent - Legacy' data-owner='Loopio' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_9a751af8-3e3e-b321-6eef-4deedaf2ef5c' data-action='Blockieren' data-channel='Copilot'>Loopio Copilot Agent - Legacy</a></td><td>Loopio</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='AI Meeting Notes TeamsMaestro' data-owner='MailMaestro' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_3761ac1d-61b6-2c85-bb52-0ffe56b2097e' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>AI Meeting Notes TeamsMaestro</a></td><td>MailMaestro</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Coursera Learning Agent' data-owner='Coursera' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_52f88dfa-91c9-c9f6-6205-ec9eb4082eb2' data-action='Blockieren' data-channel='Copilot'>Coursera Learning Agent</a></td><td>Coursera</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Loyalty Manager Copilot AI' data-owner='IntelliThing' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_bb4808bd-75dd-349f-2d61-4e20eb47a2b2' data-action='Blockieren' data-channel='Copilot'>Loyalty Manager Copilot AI</a></td><td>IntelliThing</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='WorkBoardAI for Copilot' data-owner='WorkboardAI' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_1054b4c9-1ba0-119e-ac29-1b8931437680' data-action='Blockieren' data-channel='Teams;Copilot'>WorkBoardAI for Copilot</a></td><td>WorkboardAI</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Planner Agent' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_b2f25cb5-1ccd-b7ed-8a74-35d2b43e0130' data-action='Blockieren' data-channel='Copilot'>Planner Agent</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='ArcGIS for Teams' data-owner='Esri, Inc.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_057b249d-1fcd-c93c-0556-04e54a042f7c' data-action='Blockieren' data-channel='Outlook;Teams;Office;Copilot'>ArcGIS for Teams</a></td><td>Esri, Inc.</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Office;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Zendesk Agent' data-owner='Zendesk Inc' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_a7920a86-f7d4-3c02-fcd3-52664e4f810b' data-action='Blockieren' data-channel='Teams;Copilot'>Zendesk Agent</a></td><td>Zendesk Inc</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Syrto' data-owner='Syrto' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_56d54ef6-69a0-4a5a-48f9-3599716c122d' data-action='Blockieren' data-channel='Copilot'>Syrto</a></td><td>Syrto</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Gerald' data-owner='Jetdocs' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_39f86212-5b95-7fcf-162b-b91709933f7f' data-action='Blockieren' data-channel='Teams;Copilot'>Gerald</a></td><td>Jetdocs</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='AIP Integrity Assistant' data-owner='Irth' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_1bdf2169-4670-f280-4b85-a39557f1e586' data-action='Blockieren' data-channel='Teams;Copilot'>AIP Integrity Assistant</a></td><td>Irth</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Databricks Genie' data-owner='Databricks Inc.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_32ef992f-4869-bf55-1e8e-bae284ea6998' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>Databricks Genie</a></td><td>Databricks Inc.</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='SharePoint Admin Agent' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_99028264-8010-902a-559d-f3db884f1073' data-action='Blockieren' data-channel='Copilot'>SharePoint Admin Agent</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='HR AI Agent' data-owner='Apps 365 &amp; HR365' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_e9ccc85f-116d-0fd4-64bf-17f4b4210a43' data-action='Blockieren' data-channel='Teams;Copilot'>HR AI Agent</a></td><td>Apps 365 &amp; HR365</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='KPI Buddy' data-owner='Toolpack Solutions' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_b334654c-8e54-20e3-1642-f2886ac73828' data-action='Blockieren' data-channel='Outlook;Teams;Copilot'>KPI Buddy</a></td><td>Toolpack Solutions</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Sitemate' data-owner='SITEMATE SERVICES PTY LTD.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_c346cd28-9484-ba65-fbc6-f018e44cc974' data-action='Blockieren' data-channel='Copilot'>Sitemate</a></td><td>SITEMATE SERVICES PTY LTD.</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Wix' data-owner='Wix.com LTD' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_07d26519-01f2-6ea1-db79-51999b0c9359' data-action='Blockieren' data-channel='Copilot'>Wix</a></td><td>Wix.com LTD</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Excel (Agent)' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_8d830dc1-9a14-1528-1182-c8e3be94cf5a' data-action='Blockieren' data-channel='Copilot'>Excel (Agent)</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Word (Agent)' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_15f67c5b-bfb1-fbd9-043a-cbb047bb7bd0' data-action='Blockieren' data-channel='Copilot'>Word (Agent)</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='PowerPoint (Agent)' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_54c3f25e-3850-e1e6-231a-aa85fbe9447b' data-action='Blockieren' data-channel='Copilot'>PowerPoint (Agent)</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Tavily' data-owner='Tavily' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_395bb373-075d-a8ae-3e77-c6f38e859942' data-action='Blockieren' data-channel='Copilot'>Tavily</a></td><td>Tavily</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Mural' data-owner='MURAL' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_ce281f3a-58ca-17bc-87ef-1e14e94ec2cc' data-action='Blockieren' data-channel='Teams;Outlook;Office;Copilot'>Mural</a></td><td>MURAL</td><td><span class='badge success'>Available</span></td><td>Teams;Outlook;Office;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Message Center Adoption Agent' data-owner='Cloud and Clear' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_03d4401f-ab80-c757-ed50-e93e316f557e' data-action='Blockieren' data-channel='Copilot'>Message Center Adoption Agent</a></td><td>Cloud and Clear</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Polivada' data-owner='Data Mama Ltd' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_442cee20-fdd0-b84e-b85d-bc12a03125e4' data-action='Blockieren' data-channel='Copilot'>Polivada</a></td><td>Data Mama Ltd</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Morningstar' data-owner='Morningstar, Inc.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_552435af-b62d-233e-02cd-a7c5330ba26c' data-action='Blockieren' data-channel='Copilot'>Morningstar</a></td><td>Morningstar, Inc.</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Velocity - Leave Agent' data-owner='PEAKUP' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_b16281ca-a328-705f-bc57-0b86af9074b4' data-action='Blockieren' data-channel='Copilot'>Velocity - Leave Agent</a></td><td>PEAKUP</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='AI Learning Advisor' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_8c75de5c-bfa0-68eb-5528-89a1c35a90b7' data-action='Blockieren' data-channel='Copilot'>AI Learning Advisor</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Plan My Day' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_ba30b62a-2a65-5db1-5925-b1889ad225f8' data-action='Blockieren' data-channel='Copilot'>Plan My Day</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='SME Finder' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_a8f2ed7d-faf1-5ad5-e4bc-dbd09bf80ed8' data-action='Blockieren' data-channel='Copilot'>SME Finder</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Surveys' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_a64931a6-8080-b1e7-e057-8e775a24ed66' data-action='Blockieren' data-channel='Copilot'>Surveys</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='SAP Joule' data-owner='SAP SE' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_855fb978-0c53-e355-7771-d8402fc75218' data-action='Blockieren' data-channel='Teams;Copilot'>SAP Joule</a></td><td>SAP SE</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='AutoMemo' data-owner='ソースネクスト株式会社' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_2760a8ae-0412-fb83-d6b0-9f04d143b706' data-action='Blockieren' data-channel='Copilot'>AutoMemo</a></td><td>ソースネクスト株式会社</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Draup for Sales' data-owner='Draup' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_bd446e97-1e7e-5e4a-75ac-2f54efe9770e' data-action='Blockieren' data-channel='Teams;Copilot'>Draup for Sales</a></td><td>Draup</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Lucidchart for Microsoft Teams' data-owner='Lucid Software Inc' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_98d00815-dc80-32b2-daa0-9451a024b9a6' data-action='Blockieren' data-channel='Outlook;Teams;Office;Copilot'>Lucidchart for Microsoft Teams</a></td><td>Lucid Software Inc</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Office;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Content Aviator (US)' data-owner='OpenText Americas' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_cefdf231-554e-ff6e-547e-24d43136bf44' data-action='Blockieren' data-channel='Teams;Office;Outlook;Copilot'>Content Aviator (US)</a></td><td>OpenText Americas</td><td><span class='badge success'>Available</span></td><td>Teams;Office;Outlook;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='1Task' data-owner='Idea3 llc' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_96cdbd86-caf7-77c9-93c1-fe4731655983' data-action='Blockieren' data-channel='Copilot'>1Task</a></td><td>Idea3 llc</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Backbone AI' data-owner='Backbone AI' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_e26e0a7b-4d1e-9a21-d0b6-ddf4a2f214f9' data-action='Blockieren' data-channel='Teams;Copilot'>Backbone AI</a></td><td>Backbone AI</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Content Aviator (AU)' data-owner='OpenText Americas' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_95284335-5094-c9fa-625a-a1c81cbbfa57' data-action='Blockieren' data-channel='Teams;Office;Outlook;Copilot'>Content Aviator (AU)</a></td><td>OpenText Americas</td><td><span class='badge success'>Available</span></td><td>Teams;Office;Outlook;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Content Aviator (CA)' data-owner='OpenText Americas' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_8c19c64a-216e-11de-e3f5-ced9ae08c233' data-action='Blockieren' data-channel='Teams;Office;Outlook;Copilot'>Content Aviator (CA)</a></td><td>OpenText Americas</td><td><span class='badge success'>Available</span></td><td>Teams;Office;Outlook;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Templafy' data-owner='Templafy' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_bb130977-e63f-4fde-182d-3b16dda7e77c' data-action='Blockieren' data-channel='Outlook;Teams;Copilot'>Templafy</a></td><td>Templafy</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Waldo Desk &amp; Parking Booking' data-owner='Moffi' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_3b54840a-9ba6-3c26-2294-740d1566f8e5' data-action='Blockieren' data-channel='Outlook;Teams;Office;Copilot'>Waldo Desk &amp; Parking Booking</a></td><td>Moffi</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Office;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Presentations AI' data-owner='infographfx technologies' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_9c6a19d5-5f0a-7678-7cb2-e64a6fe06504' data-action='Blockieren' data-channel='Outlook;Teams;Office;Copilot'>Presentations AI</a></td><td>infographfx technologies</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Office;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Jira Cloud' data-owner='Atlassian.com' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_e099767c-02d7-42de-03fc-c34fab23ddaa' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>Jira Cloud</a></td><td>Atlassian.com</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Teams Manager' data-owner='Solutions2Share' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_dba2ae65-b3b5-62ed-635e-4ef764bf2ac1' data-action='Blockieren' data-channel='Outlook;Teams;Office;Copilot'>Teams Manager</a></td><td>Solutions2Share</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Office;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Priority Matrix' data-owner='Appfluence Inc' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_37eaa533-3e63-8645-7602-0696f7462bbb' data-action='Blockieren' data-channel='Outlook;Teams;Office;Copilot'>Priority Matrix</a></td><td>Appfluence Inc</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Office;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Zoho Desk' data-owner='Zoho Corporation Private Limited' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_05ee3857-9c3b-6c73-f980-cf529794c14b' data-action='Blockieren' data-channel='Copilot;Outlook;Teams;Office'>Zoho Desk</a></td><td>Zoho Corporation Private Limited</td><td><span class='badge success'>Available</span></td><td>Copilot;Outlook;Teams;Office</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='askpolly' data-owner='Advanced Symbolics Inc' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_5bb87891-8043-7429-ddd8-3d3ab1bb252b' data-action='Blockieren' data-channel='Teams;Copilot'>askpolly</a></td><td>Advanced Symbolics Inc</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Norm Ai' data-owner='Norm Ai' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_dc3c53bf-640a-ae86-6ed0-1888190702b3' data-action='Blockieren' data-channel='Copilot'>Norm Ai</a></td><td>Norm Ai</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Cornerstone' data-owner='Cornerstone OnDemand' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_a6a731cd-5a3f-e4c1-d758-275759248a0e' data-action='Blockieren' data-channel='Copilot'>Cornerstone</a></td><td>Cornerstone OnDemand</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Seismic' data-owner='Seismic' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_0f81a761-6cb9-1c78-c6a5-3c0bcc3c2797' data-action='Blockieren' data-channel='Teams;Outlook;Copilot'>Seismic</a></td><td>Seismic</td><td><span class='badge success'>Available</span></td><td>Teams;Outlook;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='NetDocuments Copilot (CAN)' data-owner='NetDocuments Inc' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_ae7859a7-30f9-95e9-aeb7-4f6c0c4b53ed' data-action='Blockieren' data-channel='Outlook;Teams;Copilot'>NetDocuments Copilot (CAN)</a></td><td>NetDocuments Inc</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='ServiceDesk Plus Cloud for Microsoft Teams' data-owner='Zoho Corporation Private Limited' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_70db558f-972e-c9e8-4585-c8ad95f2cfcf' data-action='Blockieren' data-channel='Copilot;Outlook;Teams;Office'>ServiceDesk Plus Cloud for Microsoft Teams</a></td><td>Zoho Corporation Private Limited</td><td><span class='badge success'>Available</span></td><td>Copilot;Outlook;Teams;Office</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='ChalkHR Polls &amp; Surveys' data-owner='ChalkHR' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_4fec069c-d5ac-5abc-152e-ef930681d508' data-action='Blockieren' data-channel='Outlook;Teams;Office;Copilot'>ChalkHR Polls &amp; Surveys</a></td><td>ChalkHR</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Office;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Data-Driven Sales Agent' data-owner='Data-Driven AI' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_5d415318-004b-a362-f6a8-b1aba0e3f120' data-action='Blockieren' data-channel='Teams;Copilot'>Data-Driven Sales Agent</a></td><td>Data-Driven AI</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Starmind' data-owner='Starmind (inc)' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_8ec49549-56ac-e7d4-e3a5-da5cb51c3319' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>Starmind</a></td><td>Starmind (inc)</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Matter' data-owner='MatterApp Inc.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_a986e121-fd5e-9153-a4d9-3c7255d5dc4f' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>Matter</a></td><td>MatterApp Inc.</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Perform &amp; Engage 365' data-owner='Zensai UKI LTD' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_e960eca5-93c2-ccc8-cf56-a7c879f51338' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>Perform &amp; Engage 365</a></td><td>Zensai UKI LTD</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Workday' data-owner='Workday' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_217a610c-3b42-d0aa-c5bb-5ead8aa49d9f' data-action='Blockieren' data-channel='Teams;Office;Outlook;Copilot'>Workday</a></td><td>Workday</td><td><span class='badge success'>Available</span></td><td>Teams;Office;Outlook;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='ALVAO' data-owner='ALVAO s.r.o.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_964a4682-111f-ff92-9366-536cb8e6d4f6' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>ALVAO</a></td><td>ALVAO s.r.o.</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Amadeus Advisor™' data-owner='Amadeus IT Group SA' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_caee2610-19d5-a532-3789-554d2c72eaa4' data-action='Blockieren' data-channel='Teams;Copilot'>Amadeus Advisor™</a></td><td>Amadeus IT Group SA</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='CLM365 AI Agent' data-owner='Apps 365 &amp; HR365' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_41b8be48-b122-ed35-a01d-6e87dae002f3' data-action='Blockieren' data-channel='Teams;Copilot'>CLM365 AI Agent</a></td><td>Apps 365 &amp; HR365</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Finance (Frontier)' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_5b99927c-dcd2-3654-aacb-f8d82a980c83' data-action='Blockieren' data-channel='Copilot'>Finance (Frontier)</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Jurisprud&#234;ncia GPT' data-owner='Studio 365' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_9946b656-2c96-e9fa-4ce4-8ad96c5b789b' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>Jurisprud&#234;ncia GPT</a></td><td>Studio 365</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='FX Hedge' data-owner='C8 Technologies Ireland' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_b74f5b17-4a56-2a87-38f7-973e9f930735' data-action='Blockieren' data-channel='Teams;Copilot'>FX Hedge</a></td><td>C8 Technologies Ireland</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Day One Employee Onboarding' data-owner='Kainos Software' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_dbc99069-6152-cbb5-cd9f-8614927ecc8a' data-action='Blockieren' data-channel='Copilot'>Day One Employee Onboarding</a></td><td>Kainos Software</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Insight+ Ask Knowledge' data-owner='iManage Power Platform Connector' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_400b4085-0fa6-3da0-4002-308aae86557d' data-action='Blockieren' data-channel='Copilot'>Insight+ Ask Knowledge</a></td><td>iManage Power Platform Connector</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='NetDocuments Copilot (US)' data-owner='NetDocuments Inc' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_1ad856f0-38f9-d6a1-b724-10c6edbbf739' data-action='Blockieren' data-channel='Outlook;Teams;Copilot'>NetDocuments Copilot (US)</a></td><td>NetDocuments Inc</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='HUE エージェント' data-owner='株式会社ワークスアプリケーションズ' data-status='Blocked' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_a3ed0dfd-85f5-439a-1c1b-ff843cd250b0' data-action='Aktivieren' data-channel='Copilot'>HUE エージェント</a></td><td>株式会社ワークスアプリケーションズ</td><td><span class='badge danger'>Blocked</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action blue'>Aktivieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='HUE' data-owner='株式会社ワークスアプリケーションズ' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_2338e177-250f-ad77-de74-b0a7fd7c8165' data-action='Blockieren' data-channel='Outlook;Teams;Copilot'>HUE</a></td><td>株式会社ワークスアプリケーションズ</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='YDISTRI Industry Copilot' data-owner='YDISTRI' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_3c0d787e-952b-aad1-2b19-1720102093b2' data-action='Blockieren' data-channel='Teams;Copilot'>YDISTRI Industry Copilot</a></td><td>YDISTRI</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Meltwater' data-owner='Meltwater' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_54c77df8-da86-bbf7-3ebc-a43b891b3d51' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>Meltwater</a></td><td>Meltwater</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Klaxoon' data-owner='Klaxoon, a Wrike company' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_7407529c-f7b2-4410-4b01-44eaceb5159d' data-action='Blockieren' data-channel='Outlook;Teams;Copilot;Office'>Klaxoon</a></td><td>Klaxoon, a Wrike company</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot;Office</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Sift' data-owner='Sift, LLC' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_aa158823-7ff5-4cda-bd35-36e5b2fdd5d1' data-action='Blockieren' data-channel='Outlook;Teams;Office;Copilot'>Sift</a></td><td>Sift, LLC</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Office;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Verto 365' data-owner='TMI SYSTEMS LIMITED' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_4a92d831-6e6b-dcb7-6bc3-fee57f8e7c37' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>Verto 365</a></td><td>TMI SYSTEMS LIMITED</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='MyHub for AOS-US' data-owner='AvePoint, inc.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_23c023c8-704f-fb8e-7627-17e4b15b3bca' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>MyHub for AOS-US</a></td><td>AvePoint, inc.</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='GovTribe' data-owner='GovExec Media Group' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_b55f8f1d-2299-a1d5-20c5-2d4c49e765bf' data-action='Blockieren' data-channel='Copilot'>GovTribe</a></td><td>GovExec Media Group</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Coachello' data-owner='Coachello SAS' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_ff926635-069a-535c-7a8d-801a1d352429' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>Coachello</a></td><td>Coachello SAS</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Learn365' data-owner='Zensai International Aps' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_3fe96b3c-3ff6-0270-8c1f-a46916e305eb' data-action='Blockieren' data-channel='Outlook;Teams;Office;Copilot'>Learn365</a></td><td>Zensai International Aps</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Office;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Forrester AI' data-owner='Forrester Research' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_1dd6f013-d113-dd20-701f-8f12d059c5b4' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>Forrester AI</a></td><td>Forrester Research</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Perfect Wiki' data-owner='OOO RD17' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_be373803-9c6c-2af3-80c9-c857df4e4f8d' data-action='Blockieren' data-channel='Outlook;Teams;Office;Copilot'>Perfect Wiki</a></td><td>OOO RD17</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Office;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Contract Stress Test' data-owner='Dovetail by Pivotal Edge AI' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_f57f56cb-990d-82b4-0610-b9ed0e200bfa' data-action='Blockieren' data-channel='Copilot'>Contract Stress Test</a></td><td>Dovetail by Pivotal Edge AI</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Darwinbox Super Agent' data-owner='Darwinbox Digital Solutions Private Limited' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_5401d6bf-428f-3e0a-e92a-8f45c7d9b02a' data-action='Blockieren' data-channel='Teams;Copilot'>Darwinbox Super Agent</a></td><td>Darwinbox Digital Solutions Private Limited</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Zendesk Support Assistant' data-owner='Zendesk Inc' data-status='Not activated' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_5646deed-6665-9ce2-2be5-68d0462bdbc3' data-action='Review' data-channel='Copilot'>Zendesk Support Assistant</a></td><td>Zendesk Inc</td><td><span class='badge neutral'>Not activated</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action blue'>Review</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='ASC Recording Insights' data-owner='ASC Technologies AG' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_13001d9b-2af4-bd2f-5458-ffa544bc62b7' data-action='Blockieren' data-channel='Copilot;Office;Outlook;Teams'>ASC Recording Insights</a></td><td>ASC Technologies AG</td><td><span class='badge success'>Available</span></td><td>Copilot;Office;Outlook;Teams</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Decisions' data-owner='Decisions' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_9cbba571-08b3-fcc6-f589-56f5d3a84011' data-action='Blockieren' data-channel='Outlook;Teams;Office;Copilot'>Decisions</a></td><td>Decisions</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Office;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='MyHub' data-owner='AvePoint, inc.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_27501ac8-65bd-4487-2604-ca8848da76d7' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>MyHub</a></td><td>AvePoint, inc.</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Teamflect' data-owner='Teamflect' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_1d047d6d-6ff4-c8fe-85f5-e25b3b3cda07' data-action='Blockieren' data-channel='Outlook;Teams;Office;Copilot'>Teamflect</a></td><td>Teamflect</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Office;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Kanban Project Task Board' data-owner='IE Ilia Pirozhenko' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_d0d240ba-2fdc-f617-4190-ad1249b7217f' data-action='Blockieren' data-channel='Outlook;Teams;Copilot'>Kanban Project Task Board</a></td><td>IE Ilia Pirozhenko</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Website Generator by B12' data-owner='B12' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_0397e9d5-bc9d-3834-134e-b7a73585c4fc' data-action='Blockieren' data-channel='Copilot'>Website Generator by B12</a></td><td>B12</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Vantage Circle Agent' data-owner='Bargain Technologies' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_43c0d7d5-8728-691a-a53d-c668d331f27f' data-action='Blockieren' data-channel='Copilot'>Vantage Circle Agent</a></td><td>Bargain Technologies</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='iPlanner Pro for Teams' data-owner='iGlobe' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_f2104ff7-e173-21bc-60df-2dffb7832eb4' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>iPlanner Pro for Teams</a></td><td>iGlobe</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Prompt Coach' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_f0ff38f1-4d81-a9b7-dbf1-b161328daa1f' data-action='Blockieren' data-channel='Copilot'>Prompt Coach</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Now Virtual Agent' data-owner='ServiceNow' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_662b4f9c-7b26-f749-7c5a-d3d9f80099f4' data-action='Blockieren' data-channel='Teams;Copilot'>Now Virtual Agent</a></td><td>ServiceNow</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='License Agent' data-owner='Data-Driven AI' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_a1812e73-8273-01a6-7ee7-45a3dab2145b' data-action='Blockieren' data-channel='Teams;Copilot'>License Agent</a></td><td>Data-Driven AI</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='RechtGPT' data-owner='Prime AI GmbH' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_2e2b2bc7-7fb4-6f8e-b0f9-6d1e306fdb17' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>RechtGPT</a></td><td>Prime AI GmbH</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='nBold' data-owner='nBold' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_db057d6e-394c-6545-a977-8fac6cf5e058' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>nBold</a></td><td>nBold</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Figma' data-owner='Figma' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_b7afaba4-7de5-85f1-13bc-8687cbb0948f' data-action='Blockieren' data-channel='Outlook;Teams;Copilot'>Figma</a></td><td>Figma</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Confluence Cloud' data-owner='Atlassian.com' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_7c69ad60-9565-29c7-8bd9-d83f454ee238' data-action='Blockieren' data-channel='Outlook;Teams;Copilot'>Confluence Cloud</a></td><td>Atlassian.com</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='TeamViewer for Microsoft 365 and Copilot' data-owner='teamviewergmbh' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_09044e4c-5168-a9d5-bb05-9862e8097281' data-action='Blockieren' data-channel='Outlook;Teams;Office;Copilot'>TeamViewer for Microsoft 365 and Copilot</a></td><td>teamviewergmbh</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Office;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Backlog' data-owner='Nulab Inc.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_c9d1d96f-eecd-a05b-34de-9b49bd36a163' data-action='Blockieren' data-channel='Teams;Outlook;Copilot'>Backlog</a></td><td>Nulab Inc.</td><td><span class='badge success'>Available</span></td><td>Teams;Outlook;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Panopto for Microsoft Teams' data-owner='Panopto.com' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_f11bb333-9020-9598-f82d-1f21486ae2dc' data-action='Blockieren' data-channel='Outlook;Teams;Office;Copilot'>Panopto for Microsoft Teams</a></td><td>Panopto.com</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Office;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Abe' data-owner='Dalikoo' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_b8fa35e9-6b2e-b5e7-e2da-36bba360567b' data-action='Blockieren' data-channel='Teams;Outlook;Copilot;Office'>Abe</a></td><td>Dalikoo</td><td><span class='badge success'>Available</span></td><td>Teams;Outlook;Copilot;Office</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Zoho Projects' data-owner='Zoho Corporation Private Limited' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_81ac6fae-722c-4ce8-672a-298a9ec2435a' data-action='Blockieren' data-channel='Copilot;Outlook;Teams;Office'>Zoho Projects</a></td><td>Zoho Corporation Private Limited</td><td><span class='badge success'>Available</span></td><td>Copilot;Outlook;Teams;Office</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Creately' data-owner='Creately (Cinergix Pty. Ltd.)' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_9acb39d9-a1f8-47cf-2d9f-5193a1724c9e' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>Creately</a></td><td>Creately (Cinergix Pty. Ltd.)</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='AI Document Processor - UK Healthcare' data-owner='Connectbatch  Limited' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_cfb85a3c-f731-60f8-0d8d-438f22b5eab9' data-action='Blockieren' data-channel='Copilot'>AI Document Processor - UK Healthcare</a></td><td>Connectbatch  Limited</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='LegalMike' data-owner='Legalmike.ai' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_bdd828ff-f72d-5659-3158-935eed885bf0' data-action='Blockieren' data-channel='Teams;Copilot'>LegalMike</a></td><td>Legalmike.ai</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='SharePoint page agent' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_a9b4f135-6c81-77c5-4118-5598d77905c2' data-action='Blockieren' data-channel='Copilot'>SharePoint page agent</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Inventory Ops' data-owner='Blue Yonder Group, Inc' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_2a39b84d-a02d-377e-9930-299d7c385d49' data-action='Blockieren' data-channel='Teams;Copilot'>Inventory Ops</a></td><td>Blue Yonder Group, Inc</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Vani' data-owner='Zoho Corporation Private Limited' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_3d4b827e-6cd0-fb2a-a86d-6bd440af0fec' data-action='Blockieren' data-channel='Copilot;Office;Outlook;Teams'>Vani</a></td><td>Zoho Corporation Private Limited</td><td><span class='badge success'>Available</span></td><td>Copilot;Office;Outlook;Teams</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Focusworks AI Agent' data-owner='Augmentech Ltd' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_4f0fcef3-4ed8-d173-8300-f1a1b9545537' data-action='Blockieren' data-channel='Copilot'>Focusworks AI Agent</a></td><td>Augmentech Ltd</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='NetDocuments Copilot (UK)' data-owner='NetDocuments Inc' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_56800449-bc8a-44b9-0b97-979e841c643c' data-action='Blockieren' data-channel='Outlook;Teams;Copilot'>NetDocuments Copilot (UK)</a></td><td>NetDocuments Inc</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Label Audit Dokumentation V1' data-owner='mkn@mycloudofficedev.onmicrosoft.com' data-status='Draft' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='T_4ce77f97-a9bc-f2b9-591f-b2f1fa9b65f7' data-action='Review' data-channel=''>Label Audit Dokumentation V1</a></td><td>mkn@mycloudofficedev.onmicrosoft.com</td><td><span class='badge neutral'>Draft</span></td><td></td><td><span class='badge success'>Low</span></td><td><button class='btn-action blue'>Review</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Webex AI Agent' data-owner='Cisco  Webex' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_88bb4e49-4933-4c06-b006-ecc37797a1cc' data-action='Blockieren' data-channel='Copilot'>Webex AI Agent</a></td><td>Cisco  Webex</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Growthguru.ai Partner Agents' data-owner='Growthguru.ai' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_153d4a36-d181-9ace-36d6-ff633e38304d' data-action='Blockieren' data-channel='Teams;Copilot'>Growthguru.ai Partner Agents</a></td><td>Growthguru.ai</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='DataMiner Assistant' data-owner='Skyline Communications NV' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_ee8b021b-1ea3-4424-90bd-31734a4e89f7' data-action='Blockieren' data-channel='Teams;Copilot'>DataMiner Assistant</a></td><td>Skyline Communications NV</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='GPTfy AI + Salesforce' data-owner='GPTfy' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_332c56a5-83ff-3de1-5eda-0700f9e15e87' data-action='Blockieren' data-channel='Copilot'>GPTfy AI + Salesforce</a></td><td>GPTfy</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='LegalForceNavi' data-owner='LegalOn Technologies, inc.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_34f34b31-4dbd-e41f-2c38-a7650869c45c' data-action='Blockieren' data-channel='Outlook;Teams;Copilot'>LegalForceNavi</a></td><td>LegalOn Technologies, inc.</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='NIST 800-171 Assistent' data-owner='Michael Kirst-Neshva' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='T_908752f7-e600-4d54-b3ec-385c2ffd0b41' data-action='Blockieren' data-channel='Copilot'>NIST 800-171 Assistent</a></td><td>Michael Kirst-Neshva</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='TSIA Intelligence' data-owner='TSIA (Technology &amp; Services Industry Association)' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_ebc4513e-b752-ab7a-7c83-36da006b9bdf' data-action='Blockieren' data-channel='Teams;Copilot'>TSIA Intelligence</a></td><td>TSIA (Technology &amp; Services Industry Association)</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Abi' data-owner='Beroe' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_be9a59a1-37ff-789c-e3e9-ef4b0ce1d262' data-action='Blockieren' data-channel='Outlook;Teams;Copilot'>Abi</a></td><td>Beroe</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='LawVu for Microsoft Teams' data-owner='LAWVU LIMITED' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_15de840c-6838-3e58-c00f-43634b01a712' data-action='Blockieren' data-channel='Teams;Outlook;Copilot'>LawVu for Microsoft Teams</a></td><td>LAWVU LIMITED</td><td><span class='badge success'>Available</span></td><td>Teams;Outlook;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Human Success Agent' data-owner='Zensai International Aps' data-status='Not activated' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_4dd0c925-0af3-90c6-eda0-814ec3bbc3c7' data-action='Review' data-channel='Copilot'>Human Success Agent</a></td><td>Zensai International Aps</td><td><span class='badge neutral'>Not activated</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action blue'>Review</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Viva Goals' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_2fcd6c2e-ff7a-89aa-0bb9-b90106f4fa44' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>Viva Goals</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Career Coach' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_fcaaab0f-7062-e237-7557-77b846a22444' data-action='Blockieren' data-channel='Copilot'>Career Coach</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Frontline Agent (Preview)' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_720226f2-da2b-b5c6-c0b9-4ff3405ad25e' data-action='Blockieren' data-channel='Teams;Outlook;Copilot'>Frontline Agent (Preview)</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Teams;Outlook;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Workflows (Frontier)' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_91fe45e4-9413-b0e6-dad9-c855b4952367' data-action='Blockieren' data-channel='Copilot'>Workflows (Frontier)</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='App Builder (Frontier)' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_47c082d3-392a-90ba-9503-2b5c2f97137a' data-action='Blockieren' data-channel='Copilot'>App Builder (Frontier)</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Adobe Marketing Agent' data-owner='Adobe' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_c2442fe4-fffc-149e-2443-bc95ae51c94b' data-action='Blockieren' data-channel='Teams;Copilot'>Adobe Marketing Agent</a></td><td>Adobe</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Microsoft 365 Admin' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_c0fd1ab0-cbf3-7eb9-1a7d-2d823549ef31' data-action='Blockieren' data-channel='Teams;Copilot'>Microsoft 365 Admin</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Autopilot Accounts Payable AI' data-owner='Autopilot Workflow Solutions' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_c98e5b3a-2716-b130-177b-d875ea13064e' data-action='Blockieren' data-channel='Outlook;Teams;Copilot;Office'>Autopilot Accounts Payable AI</a></td><td>Autopilot Workflow Solutions</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot;Office</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='ADP Assist' data-owner='ADP, Inc.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_2fb58bc2-917d-9b6f-af31-ccae69949a72' data-action='Blockieren' data-channel='Teams;Copilot'>ADP Assist</a></td><td>ADP, Inc.</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Gieni AI Market Research Agent' data-owner='Orderfox-Gieni' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_1e99ea5b-86e5-07de-df31-3e0600d1f598' data-action='Blockieren' data-channel='Teams;Copilot'>Gieni AI Market Research Agent</a></td><td>Orderfox-Gieni</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Rovo' data-owner='Atlassian.com' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_249104a7-daa0-7bc2-4798-64b7570fef4f' data-action='Blockieren' data-channel='Teams;Copilot'>Rovo</a></td><td>Atlassian.com</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='EasyVista' data-owner='EasyVista Inc' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_3dc8de0c-389d-1177-91ca-f2756177c504' data-action='Blockieren' data-channel='Teams;Copilot'>EasyVista</a></td><td>EasyVista Inc</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Sophos Intelix' data-owner='Sophos Ltd.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_b6fc21a0-58f6-eaf8-6cbd-6b9951673855' data-action='Blockieren' data-channel='Teams;Copilot'>Sophos Intelix</a></td><td>Sophos Ltd.</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='NetDocuments Copilot (AU)' data-owner='NetDocuments Inc' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_0bb56a96-1481-d944-bca6-d02184e95e80' data-action='Blockieren' data-channel='Outlook;Teams;Copilot'>NetDocuments Copilot (AU)</a></td><td>NetDocuments Inc</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Learning Coach' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_b54e6047-b9a6-9bac-c4fb-3351adb63aa9' data-action='Blockieren' data-channel='Copilot'>Learning Coach</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Booking Room Pro' data-owner='Witivio' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_0023883f-09d2-d7bd-03a1-06b6a0d84c6c' data-action='Blockieren' data-channel='Outlook;Teams;Copilot'>Booking Room Pro</a></td><td>Witivio</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='FactSet' data-owner='FactSet' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_ee9aadd6-000d-97c5-f01c-4707d39fa0e4' data-action='Blockieren' data-channel='Teams;Outlook;Copilot'>FactSet</a></td><td>FactSet</td><td><span class='badge success'>Available</span></td><td>Teams;Outlook;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Finance Admin for Xero' data-owner='Data-Driven AI' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_e5366c60-5b41-8588-696e-e8bc2328e608' data-action='Blockieren' data-channel='Teams;Copilot'>Finance Admin for Xero</a></td><td>Data-Driven AI</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Youkeeps AI Personal Assistant' data-owner='Youkeeps Global' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_6d45247b-483c-192b-bf7a-dbfdd31e2262' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>Youkeeps AI Personal Assistant</a></td><td>Youkeeps Global</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Analyst' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_8cfc4e6f-267e-db15-c6e7-3fc47a54f61e' data-action='Blockieren' data-channel='Copilot'>Analyst</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Trados' data-owner='RWS GROUP LIMITED' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_cbc3b006-7aa6-bb05-14ca-82609733918a' data-action='Blockieren' data-channel='Teams;Copilot'>Trados</a></td><td>RWS GROUP LIMITED</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Idea Coach' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_be483bea-dc19-b6ae-1d69-fde1f2c7b661' data-action='Blockieren' data-channel='Copilot'>Idea Coach</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='LexisNexis Prot&#233;g&#233;™ (US)' data-owner='LexisNexis SA' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_f03788b0-b117-a75f-40ed-e24317d12999' data-action='Blockieren' data-channel='Teams;Copilot'>LexisNexis Prot&#233;g&#233;™ (US)</a></td><td>LexisNexis SA</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Snowflake Cortex Agents' data-owner='Snowflake Inc' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_2a48ff95-9223-2af0-69c4-fd49382f0226' data-action='Blockieren' data-channel='Teams;Copilot'>Snowflake Cortex Agents</a></td><td>Snowflake Inc</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Wegrow for Copilot' data-owner='Wegrow' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_79bc29cb-cae9-b032-0e02-85d897c538ff' data-action='Blockieren' data-channel='Teams;Copilot'>Wegrow for Copilot</a></td><td>Wegrow</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='UiPath Autopilot' data-owner='UiPath Incorporated' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_54b2cac4-b9c8-00e1-ddb8-2c3cd0a97b6c' data-action='Blockieren' data-channel='Teams;Outlook;Copilot'>UiPath Autopilot</a></td><td>UiPath Incorporated</td><td><span class='badge success'>Available</span></td><td>Teams;Outlook;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Writing Coach' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_e3d64609-7a28-6de6-3093-402c20bb96ce' data-action='Blockieren' data-channel='Copilot'>Writing Coach</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Dropbox' data-owner='Dropbox Inc.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_2d63ef3c-adb7-4b3a-bb64-231320120ec9' data-action='Blockieren' data-channel='Teams;Outlook;Copilot;Office'>Dropbox</a></td><td>Dropbox Inc.</td><td><span class='badge success'>Available</span></td><td>Teams;Outlook;Copilot;Office</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='SharePoint list agent' data-owner='Microsoft Corporation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_d57d4da7-846d-b18b-1845-90ea5921bed8' data-action='Blockieren' data-channel='Copilot'>SharePoint list agent</a></td><td>Microsoft Corporation</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='NexAA' data-owner='TVS Next Ltd' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_e2e29e2c-3b7e-9d9f-debd-bdbca826e24c' data-action='Blockieren' data-channel='Outlook;Teams;Copilot'>NexAA</a></td><td>TVS Next Ltd</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Certifi' data-owner='OptimusInformation' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_29df7123-7067-9a82-562f-043ba46a0ccf' data-action='Blockieren' data-channel='Teams;Office;Outlook;Copilot'>Certifi</a></td><td>OptimusInformation</td><td><span class='badge success'>Available</span></td><td>Teams;Office;Outlook;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='AI for Work' data-owner='KoreaiAzureAgentMarketplace' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_bef3a50c-337a-2c9d-3d13-b8cd1f1589a4' data-action='Blockieren' data-channel='Teams;Copilot'>AI for Work</a></td><td>KoreaiAzureAgentMarketplace</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='ClickWith Copilot' data-owner='Smart Leader' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_85e36237-1320-c5c7-bb43-6b22e3f34673' data-action='Blockieren' data-channel='Teams;Copilot'>ClickWith Copilot</a></td><td>Smart Leader</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='TagMyFav' data-owner='AVISHKARAM TECHNOLOGIES PVT. LTD.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_563ee028-1600-28fe-4347-887fd09e2a5c' data-action='Blockieren' data-channel='Outlook;Teams;Office;Copilot'>TagMyFav</a></td><td>AVISHKARAM TECHNOLOGIES PVT. LTD.</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Office;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Sight Machine Agent' data-owner='Sight Machine, Inc' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_e44c9c07-7cc1-8060-b1f7-04283153c3e9' data-action='Blockieren' data-channel='Teams;Copilot'>Sight Machine Agent</a></td><td>Sight Machine, Inc</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='PHONE APPLI PEOPLE bot' data-owner='PHONE APPLI' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_cf616f06-271b-8272-a049-a1f3144453bf' data-action='Blockieren' data-channel='Teams;Outlook;Copilot'>PHONE APPLI PEOPLE bot</a></td><td>PHONE APPLI</td><td><span class='badge success'>Available</span></td><td>Teams;Outlook;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Gloat Copilot Agent' data-owner='Gloat' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_dfbcba81-f7e1-1bc3-e495-9d4f24b7cc16' data-action='Blockieren' data-channel='Copilot'>Gloat Copilot Agent</a></td><td>Gloat</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='SlidesGPT' data-owner='Lightstone GmbH' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_302a0c99-13fa-b72a-4494-3bcbaa515c3d' data-action='Blockieren' data-channel='Copilot'>SlidesGPT</a></td><td>Lightstone GmbH</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Lupl for Teams' data-owner='Lupl, Inc.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_d297d49e-2e52-b555-f7da-4746436e600b' data-action='Blockieren' data-channel='Outlook;Teams;Copilot'>Lupl for Teams</a></td><td>Lupl, Inc.</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Simpatico' data-owner='Mesh Assist Pty Ltd' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_0144db69-dd94-443d-cd7e-f3aaf0f6935c' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>Simpatico</a></td><td>Mesh Assist Pty Ltd</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='EcoMatcher' data-owner='EcoMatcher Limited' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_93ca5108-820b-e163-147b-1419cce9d53e' data-action='Blockieren' data-channel='Office;Outlook;Teams;Copilot'>EcoMatcher</a></td><td>EcoMatcher Limited</td><td><span class='badge success'>Available</span></td><td>Office;Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Helpdesk 365 AI Agent' data-owner='Apps 365 &amp; HR365' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_fad8695c-d038-7938-d570-1367034f1790' data-action='Blockieren' data-channel='Teams;Copilot'>Helpdesk 365 AI Agent</a></td><td>Apps 365 &amp; HR365</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Oceans of Data' data-owner='Oceans ehf' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_2060d6a9-48f3-fdcf-bb8e-ee328a5fc4d2' data-action='Blockieren' data-channel='Teams;Copilot'>Oceans of Data</a></td><td>Oceans ehf</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Supermetrics Marketing Analyst' data-owner='Supermetrics' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_482b5243-c377-5a5d-d187-63349eb2d106' data-action='Blockieren' data-channel='Copilot'>Supermetrics Marketing Analyst</a></td><td>Supermetrics</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Genspark' data-owner='Genspark' data-status='Not activated' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_c22e65a4-6345-bbdc-2dc8-18fa142c629d' data-action='Review' data-channel='Copilot'>Genspark</a></td><td>Genspark</td><td><span class='badge neutral'>Not activated</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action blue'>Review</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Bitly' data-owner='Bitly, Inc.' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_f1102987-92c0-97a6-204d-521daf4cca2b' data-action='Blockieren' data-channel='Copilot'>Bitly</a></td><td>Bitly, Inc.</td><td><span class='badge success'>Available</span></td><td>Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='NetDocuments Copilot (DE)' data-owner='NetDocuments Inc' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_5bc5e167-bad2-86ae-3179-a68b36df6880' data-action='Blockieren' data-channel='Outlook;Teams;Copilot'>NetDocuments Copilot (DE)</a></td><td>NetDocuments Inc</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='ORSERS HCM Agent' data-owner='ORSERS Consulting Services' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_0dba957f-3c3e-615d-cbd7-4c51d16d897c' data-action='Blockieren' data-channel='Teams;Copilot'>ORSERS HCM Agent</a></td><td>ORSERS Consulting Services</td><td><span class='badge success'>Available</span></td><td>Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Workway' data-owner='Mindvalley' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_9be3f265-1c0c-756d-90c1-c7c330945899' data-action='Blockieren' data-channel='Copilot;Outlook;Teams;Office'>Workway</a></td><td>Mindvalley</td><td><span class='badge success'>Available</span></td><td>Copilot;Outlook;Teams;Office</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Partner Onboarding' data-owner='Datamatics Global Services Ltd' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_e68d994e-c4bb-65d4-13ad-dfc71a6a7fcd' data-action='Blockieren' data-channel='Outlook;Teams;Copilot'>Partner Onboarding</a></td><td>Datamatics Global Services Ltd</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+<tr><td><a href='#' class='agent-link' style='text-decoration:none; color:#4f46e5; font-weight:600;' data-name='Lexis&#174; Create DMS for Copilot' data-owner='Henchman B.V' data-status='Available' data-risk='Low' data-source='M365 Admin Center CSV' data-appid='P_5581ba3a-c317-9106-21b4-f7514ee5e17d' data-action='Blockieren' data-channel='Outlook;Teams;Copilot'>Lexis&#174; Create DMS for Copilot</a></td><td>Henchman B.V</td><td><span class='badge success'>Available</span></td><td>Outlook;Teams;Copilot</td><td><span class='badge success'>Low</span></td><td><button class='btn-action solid-red'>Blockieren</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+    </div>
+  </main>
+</div>
+<!-- Modal Backdrop & Detail Drawer -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="if(event.target===this) closeModal()">
+  <div class="modal-drawer" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-header">
+      <div class="modal-title-row">
+        <div class="modal-icon" id="modalIcon">🤖</div>
+        <div class="modal-title-info">
+          <h2 id="modalName">Canva</h2>
+          <span class="modal-badge success" id="modalStatus">Verfügbar</span>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn primary" id="btnInstall" onclick="triggerModalAction('activate')">
+          <span>Installieren</span>
+        </button>
+        <button class="modal-btn danger" id="btnBlock" onclick="triggerModalAction('block')">
+          <span>Blockieren</span>
+        </button>
+      </div>
+    </div>
+    
+    <div class="modal-tabs">
+      <div class="modal-tab active" onclick="switchTab(event, 'details')">Details</div>
+      <div class="modal-tab" onclick="switchTab(event, 'benutzer')">Benutzer</div>
+      <div class="modal-tab" onclick="switchTab(event, 'tools')">Daten & Tools</div>
+      <div class="modal-tab" onclick="switchTab(event, 'permissions')">Berechtigungen</div>
+      <div class="modal-tab" onclick="switchTab(event, 'certification')">Zertifizierung</div>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Details Tab Content -->
+      <div class="modal-tab-content active" id="tab-details">
+        <p style="color:#475569; font-size:13px; margin-bottom:20px; line-height:1.5;" id="modalDesc">
+          Teams can use Canva create presentations, videos, graphics, posters and more – then share them with the world!
+        </p>
+        <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:12px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">Übersicht</h3>
+        <div class="modal-info-grid">
+          <div class="modal-info-item"><label>Erstellungsdatum</label><span>17. Juli 2025</span></div>
+          <div class="modal-info-item"><label>Zuletzt aktualisiert</label><span>18. Juni 2026</span></div>
+          <div class="modal-info-item"><label>Herausgebertyp</label><span id="modalPublisher">Drittanbieter</span></div>
+          <div class="modal-info-item"><label>Kanal</label><span id="modalChannel">Teams, Outlook, M365</span></div>
+          <div class="modal-info-item"><label>Entra-Agent-ID</label><span id="modalAppId" style="font-family:monospace; font-size:11px;">-</span></div>
+          <div class="modal-info-item"><label>Datenquelle</label><span id="modalSource">Teams App Catalog</span></div>
+        </div>
+      </div>
+      
+      <!-- Benutzer Tab Content -->
+      <div class="modal-tab-content" id="tab-benutzer">
+        <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:6px;">Benutzer und Installation</h3>
+        <p style="font-size:12px; color:#64748b; margin-bottom:16px;">Steuert, wo und wie der KI-Agent in Ihrer Organisation verfügbar ist.</p>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:#334155; cursor:pointer;">
+            <input type="radio" name="userScope" checked> <span>Alle Benutzer</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:#334155; cursor:pointer;">
+            <input type="radio" name="userScope"> <span>Keine Benutzer</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:#334155; cursor:pointer;">
+            <input type="radio" name="userScope"> <span>Bestimmte Benutzer oder Gruppen</span>
+          </label>
+        </div>
+      </div>
+      
+      <!-- Daten & Tools Content -->
+      <div class="modal-tab-content" id="tab-tools">
+        <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:12px;">Funktionen</h3>
+        <p style="font-size:12px; color:#64748b; margin-bottom:16px;">Gibt an, wie dieser Agent bestimmte Aufgaben ausführen und auf Datenquellen zugreifen kann.</p>
+        <div class="modal-info-grid" style="margin-bottom:20px;">
+          <div class="modal-info-item"><label>Kann lesen</label><span>Keine</span></div>
+          <div class="modal-info-item"><label>Graph-Connectors</label><span>Keine</span></div>
+        </div>
+        <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:12px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">Wissen & MCP Tools</h3>
+        <table class="permission-table">
+          <thead>
+            <tr><th>Name</th><th>Beschreibung</th><th>Typ</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b id="modalToolName">Canva</b></td>
+              <td id="modalToolDesc">Generate, edit, and export Canva designs directly from chat.</td>
+              <td id="modalToolType">RemoteMCPServer</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Permissions Tab Content -->
+      <div class="modal-tab-content" id="tab-permissions">
+        <div style="background:#fffbeb; border-left:4px solid #f59e0b; padding:12px; border-radius:6px; color:#b45309; font-size:12px; margin-bottom:16px;">
+          ⚠ Überprüfen Sie die vom Agenten benötigten Berechtigungen und erteilen Sie die Admin-Zustimmung für Ihre Organisation.
+        </div>
+        <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:8px;">Microsoft Graph Berechtigungen</h3>
+        <table class="permission-table">
+          <thead>
+            <tr><th>Anspruchswert</th><th>Beschreibung</th><th>Typ</th><th>Berechtigungsebene</th></tr>
+          </thead>
+          <tbody id="permissionRows">
+            <tr>
+              <td>User.Read</td>
+              <td>Allows users to sign in to the app and read the profile</td>
+              <td>Delegiert</td>
+              <td>
+                <div class="permission-bar-container">
+                  <div class="permission-bar filled-low"></div><div class="permission-bar"></div><div class="permission-bar"></div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Files.ReadWrite.All</td>
+              <td>Allows the app to read, create, update and delete files</td>
+              <td>Delegiert</td>
+              <td>
+                <div class="permission-bar-container">
+                  <div class="permission-bar filled-high"></div><div class="permission-bar filled-high"></div><div class="permission-bar filled-high"></div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Certification Tab Content -->
+      <div class="modal-tab-content" id="tab-certification">
+        <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:12px;">Zertifizierung</h3>
+        <p style="font-size:13px; color:#475569; line-height:1.5;">
+          Für diese App sind keine Zertifizierungs- oder Herausgebernachweise verfügbar. Informationen zu Sicherheit und Compliance sowie zugehörige Berichte für Microsoft-Apps finden Sie im Service Trust Portal.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Billing Modal Backdrop & Detail Drawer -->
+<div class="modal-backdrop" id="billingModalBackdrop" onclick="if(event.target===this) closeBillingModal()">
+  <div class="modal-drawer" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeBillingModal()">×</button>
+    <div class="modal-header">
+      <div class="modal-title-row">
+        <div class="modal-icon" style="background:#e0f2fe; color:#0284c7; display:flex; align-items:center; justify-content:center;">💳</div>
+        <div class="modal-title-info">
+          <h2 id="billingModalName">Abrechnungsplan</h2>
+          <span class="modal-badge success" id="billingModalStatus">Aktiv</span>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn" style="border:1px solid var(--line); background:white; cursor:pointer;" onclick="triggerBillingAction(document.getElementById('billingPlanName').innerText)">
+          <span>Plan bearbeiten</span>
+        </button>
+      </div>
+    </div>
+    
+    <div class="modal-tabs">
+      <div class="modal-tab active" onclick="switchBillingTab(event, 'billing-details')">Plandetails</div>
+      <div class="modal-tab" onclick="switchBillingTab(event, 'billing-meters')">Meter</div>
+      <div class="modal-tab" onclick="switchBillingTab(event, 'billing-envs')">Zielumgebungen</div>
+    </div>
+    
+    <div class="modal-body">
+      <!-- Plandetails Tab Content -->
+      <div class="modal-tab-content active" id="tab-billing-details">
+        <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:12px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">Plandetails</h3>
+        <div class="modal-info-grid">
+          <div class="modal-info-item"><label>Name des Abrechnungsplans</label><span id="billingPlanName">-</span></div>
+          <div class="modal-info-item"><label>Azure-Abonnement</label><span id="billingAzureSub">-</span></div>
+          <div class="modal-info-item"><label>Ressourcengruppe</label><span id="billingResourceGroup">-</span></div>
+          <div class="modal-info-item"><label>Region</label><span id="billingRegion">Deutschland</span></div>
+          <div class="modal-info-item"><label>Status</label><span id="billingPlanStatus" style="font-weight:600; color:#16a34a;">Aktiviert</span></div>
+        </div>
+      </div>
+      
+      <!-- Meter Tab Content -->
+      <div class="modal-tab-content" id="tab-billing-meters">
+        <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:12px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">Konfigurierte Meter</h3>
+        <table class="permission-table">
+          <thead>
+            <tr><th>Meter-Name</th><th>Beschreibung</th><th>Kategorie</th></tr>
+          </thead>
+          <tbody id="billingMeterRows">
+            <tr><td><b>Dataverse</b></td><td>Datenbank-Kapazität und API-Zugriffe</td><td>Power Platform</td></tr>
+            <tr><td><b>Windows 365 für Agents</b></td><td>Virtuelle PC-Kapazitäten für Laufzeiten</td><td>Windows 365</td></tr>
+            <tr><td><b>Copilot Studio</b></td><td>Sitzungsgebühren und Bot-Laufzeiten</td><td>Copilot Studio</td></tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Zielumgebungen Tab Content -->
+      <div class="modal-tab-content" id="tab-billing-envs">
+        <h3 style="font-size:14px; font-weight:700; color:#0f172a; margin-bottom:12px; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">Zielumgebungen</h3>
+        <table class="permission-table">
+          <thead>
+            <tr><th>Umgebung</th><th>Typ</th><th>Status</th></tr>
+          </thead>
+          <tbody id="billingEnvRows">
+            <tr><td><b>mycloudofficedev (default)</b></td><td>Production</td><td><span class="badge success">Verknüpft</span></td></tr>
+            <tr><td><b>mycloudofficedev</b></td><td>Sandbox</td><td><span class="badge success">Verknüpft</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var currentAgentData = null;
+function openModal(agentData) {
+  currentAgentData = agentData;
+  document.getElementById('modalName').innerText = agentData.name || 'Unbekannt';
+  document.getElementById('modalPublisher').innerText = agentData.owner || 'Drittanbieter';
+  
+  var statusBadge = document.getElementById('modalStatus');
+  statusBadge.className = 'modal-badge';
+  var statusText = agentData.status || 'Verfügbar';
+  statusBadge.innerText = statusText;
+  
+  if (statusText === 'Aktiv' || statusText === 'Active') {
+    statusBadge.classList.add('success');
+  } else if (statusText === 'Verfügbar' || statusText === 'Available') {
+    statusBadge.classList.add('success');
+  } else if (statusText === 'Blocked' || statusText === 'Blockiert' || statusText === 'Disabled') {
+    statusBadge.innerText = 'Blockiert';
+    statusBadge.classList.add('danger');
+  } else {
+    statusBadge.classList.add('warning');
+  }
+  
+  document.getElementById('modalAppId').innerText = agentData.appid || '-';
+  document.getElementById('modalSource').innerText = agentData.source || 'M365 Store';
+  document.getElementById('modalChannel').innerText = agentData.channel || 'Teams, Outlook, M365';
+  
+  // Custom descriptions based on app name
+  var desc = 'Teams can use ' + agentData.name + ' to automate tasks, generate content and query services within your Microsoft 365 tenant.';
+  var toolName = agentData.name;
+  var toolDesc = 'Generate, edit and process queries using ' + agentData.name + ' integrations.';
+  var toolType = 'RemoteMCPServer';
+  
+  if (agentData.name.toLowerCase().indexOf('canva') !== -1) {
+    desc = 'Teams can use Canva to create presentations, videos, graphics, posters and more – then share them with the world! The Canva app keeps everyone in the loop with key design assets in one place.';
+    toolName = 'Canva';
+    toolDesc = 'Generate, edit, and export Canva designs directly from chat.';
+  } else if (agentData.name.toLowerCase().indexOf('conductor') !== -1) {
+    desc = 'Conductor AEO (Answer Engine Optimization) is an enterprise-grade agent built to boost search engine query readiness and analyze digital signals within M365.';
+    toolName = 'Conductor AEO';
+    toolDesc = 'Boost search engine visibility and analyze digital signals.';
+  } else if (agentData.name.toLowerCase().indexOf('nist') !== -1) {
+    desc = 'NIST 800-171 Assister is a custom compliance agent trained to review infrastructure documents, map security requirements, and assess GRC gaps.';
+    toolName = 'NIST Compliance Engine';
+    toolDesc = 'Assess security controls and gaps dynamically.';
+    toolType = 'PowerPlatform Dataverse Agent';
+  }
+  
+  document.getElementById('modalDesc').innerText = desc;
+  document.getElementById('modalToolName').innerText = toolName;
+  document.getElementById('modalToolDesc').innerText = toolDesc;
+  document.getElementById('modalToolType').innerText = toolType;
+  
+  // Dynamic permissions list
+  var permHtml = '';
+  if (agentData.name.toLowerCase().indexOf('canva') !== -1) {
+    permHtml += '<tr><td>Contacts.Read</td><td>Allows the app to read user contacts</td><td>Delegiert</td><td><div class="permission-bar-container"><div class="permission-bar filled-low"></div><div class="permission-bar"></div><div class="permission-bar"></div></div></td></tr>';
+    permHtml += '<tr><td>email</td><td>Allows the app to read users primary email address</td><td>Delegiert</td><td><div class="permission-bar-container"><div class="permission-bar filled-low"></div><div class="permission-bar"></div><div class="permission-bar"></div></div></td></tr>';
+    permHtml += '<tr><td>Files.ReadWrite.All</td><td>Allows read/write access to all user files</td><td>Delegiert</td><td><div class="permission-bar-container"><div class="permission-bar filled-high"></div><div class="permission-bar filled-high"></div><div class="permission-bar filled-high"></div></div></td></tr>';
+    permHtml += '<tr><td>Sites.ReadWrite.All</td><td>Allows edit or delete access to SharePoint site collections</td><td>Delegiert</td><td><div class="permission-bar-container"><div class="permission-bar filled-high"></div><div class="permission-bar filled-high"></div><div class="permission-bar filled-high"></div></div></td></tr>';
+  } else {
+    permHtml += '<tr><td>User.Read</td><td>Read user profile information</td><td>Delegiert</td><td><div class="permission-bar-container"><div class="permission-bar filled-low"></div><div class="permission-bar"></div><div class="permission-bar"></div></div></td></tr>';
+    permHtml += '<tr><td>Directory.Read.All</td><td>Read directory data</td><td>Application</td><td><div class="permission-bar-container"><div class="permission-bar filled-high"></div><div class="permission-bar filled-high"></div><div class="permission-bar"></div></div></td></tr>';
+  }
+  document.getElementById('permissionRows').innerHTML = permHtml;
+  
+  // Show / Hide buttons based on status
+  var btnInstall = document.getElementById('btnInstall');
+  var btnBlock = document.getElementById('btnBlock');
+  if (agentData.status === 'Verfügbar' || agentData.status === 'Available' || agentData.status === 'Blocked' || agentData.status === 'Blockiert' || agentData.status === 'Disabled') {
+    if (agentData.status === 'Blocked' || agentData.status === 'Blockiert' || agentData.status === 'Disabled') {
+      btnInstall.querySelector('span').innerText = 'Aktivieren';
+      btnInstall.style.display = 'block';
+      btnBlock.style.display = 'none';
+    } else {
+      btnInstall.querySelector('span').innerText = 'Installieren';
+      btnInstall.style.display = 'block';
+      btnBlock.style.display = 'none';
+    }
+  } else {
+    btnInstall.style.display = 'none';
+    btnBlock.style.display = 'block';
+  }
+  
+  // Reset tabs
+  var tabs = document.querySelectorAll('.modal-tab');
+  tabs.forEach(function(t) { t.classList.remove('active'); });
+  tabs[0].classList.add('active');
+  
+  var contents = document.querySelectorAll('.modal-tab-content');
+  contents.forEach(function(c) { c.classList.remove('active'); });
+  document.getElementById('tab-details').classList.add('active');
+
+  document.getElementById('modalBackdrop').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalBackdrop').classList.remove('open');
+}
+
+async function triggerModalAction(actionType) {
+  if (!currentAgentData) return;
+  const agentName = currentAgentData.name;
+  
+  const repo = localStorage.getItem('grc_repo');
+  const token = localStorage.getItem('grc_token');
+  const branch = localStorage.getItem('grc_branch') || 'main';
+  
+  if (!repo || !token) {
+    alert('Bitte konfiguriere zuerst dein GitHub-Repository und dein GitHub-Token auf der Config-Seite.');
+    window.location.href = '../config/';
+    return;
+  }
+  
+  const initiatorUpn = localStorage.getItem('grc_user_upn') || 'micha@compliance-services.de';
+  
+  let actionText = actionType === 'block' ? 'blockieren' : (actionType === 'install' ? 'installieren' : 'aktivieren');
+  if (confirm('Möchtest du den Agenten "' + agentName + '" wirklich ' + actionText + '?')) {
+    try {
+      const path = '/repos/' + repo + '/actions/workflows/60-agent-status-action.yml/dispatches';
+      const response = await fetch('https://api.github.com' + path, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/vnd.github+json',
+          'Authorization': 'Bearer ' + token,
+          'X-GitHub-Api-Version': '2022-11-28'
+        },
+        body: JSON.stringify({
+          ref: branch,
+          inputs: {
+            targetId: agentName,
+            action: actionType,
+            initiatorUpn: initiatorUpn,
+            dryRun: 'false'
+          }
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+      
+      alert('Erfolgreich! Der GitHub-Workflow "60 - Agent Status Action" wurde gestartet, um den Agenten "' + agentName + '" zu ' + actionText + '. (Hinweis: Die Freigabe erfordert ggf. eine manuelle Bestätigung im Workflow)');
+      closeModal();
+    } catch (e) {
+      alert('Fehler beim Starten des Workflows: ' + e.message);
+    }
+  }
+}
+
+async function triggerBillingAction(planName) {
+  const repo = localStorage.getItem('grc_repo');
+  const token = localStorage.getItem('grc_token');
+  const branch = localStorage.getItem('grc_branch') || 'main';
+  
+  if (!repo || !token) {
+    alert('Bitte konfiguriere zuerst dein GitHub-Repository und dein GitHub-Token auf der Config-Seite.');
+    window.location.href = '../config/';
+    return;
+  }
+  
+  const limitValue = prompt('Gib das neue Budgetlimit für den Abrechnungsplan "' + planName + '" in EUR ein:', "1000");
+  if (limitValue === null) return;
+  
+  const initiatorUpn = localStorage.getItem('grc_user_upn') || 'micha@compliance-services.de';
+  
+  if (confirm('Möchtest du das Budget für "' + planName + '" wirklich auf ' + limitValue + ' EUR anpassen?')) {
+    try {
+      const path = '/repos/' + repo + '/actions/workflows/70-billing-change-action.yml/dispatches';
+      const response = await fetch('https://api.github.com' + path, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/vnd.github+json',
+          'Authorization': 'Bearer ' + token,
+          'X-GitHub-Api-Version': '2022-11-28'
+        },
+        body: JSON.stringify({
+          ref: branch,
+          inputs: {
+            targetId: planName,
+            action: 'budget-change',
+            budgetLimit: limitValue,
+            initiatorUpn: initiatorUpn,
+            dryRun: 'false'
+          }
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+      
+      alert('Erfolgreich! Der GitHub-Workflow "70 - Billing Change Action" wurde gestartet, um das Budget für "' + planName + '" auf ' + limitValue + ' EUR anzupassen.');
+      closeBillingModal();
+    } catch (e) {
+      alert('Fehler beim Starten des Workflows: ' + e.message);
+    }
+  }
+}
+
+function switchTab(evt, tabName) {
+  var tabs = document.querySelectorAll('.modal-tab');
+  tabs.forEach(function(t) { t.classList.remove('active'); });
+  evt.currentTarget.classList.add('active');
+  
+  var contents = document.querySelectorAll('.modal-tab-content');
+  contents.forEach(function(c) { c.classList.remove('active'); });
+  document.getElementById('tab-' + tabName).classList.add('active');
+}
+
+function openBillingModal(data) {
+  document.getElementById('billingModalName').innerText = data.name || 'Abrechnungsplan';
+  document.getElementById('billingPlanName').innerText = data.name || '-';
+  document.getElementById('billingAzureSub').innerText = data.subscription || '-';
+  document.getElementById('billingResourceGroup').innerText = data.rg || '-';
+  
+  var region = 'Deutschland';
+  if (data.name && data.name.toLowerCase().indexOf('global') !== -1) { region = 'Europa (West)'; }
+  document.getElementById('billingRegion').innerText = region;
+
+  var tabs = document.querySelectorAll('#billingModalBackdrop .modal-tab');
+  tabs.forEach(function(t) { t.classList.remove('active'); });
+  tabs[0].classList.add('active');
+  
+  var contents = document.querySelectorAll('#billingModalBackdrop .modal-tab-content');
+  contents.forEach(function(c) { c.classList.remove('active'); });
+  document.getElementById('tab-billing-details').classList.add('active');
+
+  document.getElementById('billingModalBackdrop').classList.add('open');
+}
+
+function closeBillingModal() {
+  document.getElementById('billingModalBackdrop').classList.remove('open');
+}
+
+function switchBillingTab(evt, tabName) {
+  var tabs = document.querySelectorAll('#billingModalBackdrop .modal-tab');
+  tabs.forEach(function(t) { t.classList.remove('active'); });
+  evt.currentTarget.classList.add('active');
+  
+  var contents = document.querySelectorAll('#billingModalBackdrop .modal-tab-content');
+  contents.forEach(function(c) { c.classList.remove('active'); });
+  document.getElementById('tab-' + tabName).classList.add('active');
+}
+
+function onGlobalSearch() {
+  var query = document.getElementById('globalSearch').value.toLowerCase();
+  var tables = document.querySelectorAll('.main-content-wrapper table');
+  tables.forEach(function(table) {
+    var rows = table.querySelectorAll('tbody tr');
+    rows.forEach(function(row) {
+      if (row.cells.length > 0 && !row.cells[0].classList.contains('empty')) {
+        var text = row.innerText.toLowerCase();
+        if (text.indexOf(query) > -1) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      }
+    });
+  });
+}
+
+var sortDirections = {};
+function sortTable(tableIndex, colIndex) {
+  var tables = document.querySelectorAll('.main-content-wrapper table');
+  if (tableIndex >= tables.length) return;
+  var table = tables[tableIndex];
+  var tbody = table.querySelector('tbody');
+  var rows = Array.from(tbody.querySelectorAll('tr'));
+  if (rows.length === 0 || rows[0].cells.length <= colIndex) return;
+  if (rows[0].cells[0].getAttribute('colspan')) return; // empty row
+  
+  var key = tableIndex + '-' + colIndex;
+  var dir = sortDirections[key] === 'asc' ? 'desc' : 'asc';
+  sortDirections[key] = dir;
+  
+  rows.sort(function(a, b) {
+    if (a.cells.length <= colIndex || b.cells.length <= colIndex) return 0;
+    var cellA = a.cells[colIndex].innerText.trim();
+    var cellB = b.cells[colIndex].innerText.trim();
+    
+    var valA = isNaN(cellA.replace(' €','').replace('%','').trim()) ? cellA.toLowerCase() : parseFloat(cellA);
+    var valB = isNaN(cellB.replace(' €','').replace('%','').trim()) ? cellB.toLowerCase() : parseFloat(cellB);
+    
+    if (valA < valB) return dir === 'asc' ? -1 : 1;
+    if (valA > valB) return dir === 'asc' ? 1 : -1;
+    return 0;
+  });
+  
+  tbody.innerHTML = '';
+  rows.forEach(function(row) { tbody.appendChild(row); });
+  
+  var headers = table.querySelectorAll('thead th');
+  headers.forEach(function(th, idx) {
+    var text = th.innerText.replace(' ▲', '').replace(' ▼', '').replace(' ↕', '');
+    if (idx === colIndex) {
+      th.innerHTML = text + (dir === 'asc' ? ' ▲' : ' ▼');
+    } else if (th.style.cursor === 'pointer') {
+      th.innerHTML = text + ' ↕';
+    }
+  });
+}
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.body.addEventListener('click', function(e) {
+    var link = e.target.closest('.agent-link');
+    if (link) {
+      e.preventDefault();
+      var data = {
+        name: link.getAttribute('data-name'),
+        owner: link.getAttribute('data-owner'),
+        status: link.getAttribute('data-status'),
+        risk: link.getAttribute('data-risk'),
+        source: link.getAttribute('data-source'),
+        appid: link.getAttribute('data-appid'),
+        action: link.getAttribute('data-action')
+      };
+      openModal(data);
+    }
+    
+    var billingLink = e.target.closest('.billing-link, .billing-btn');
+    if (billingLink) {
+      e.preventDefault();
+      var data = {
+        name: billingLink.getAttribute('data-name'),
+        subscription: billingLink.getAttribute('data-subscription'),
+        rg: billingLink.getAttribute('data-rg')
+      };
+      openBillingModal(data);
+    }
+  });
+  // Check auth UPN display
+  const upn = localStorage.getItem('grc_user_upn');
+  const name = localStorage.getItem('grc_user_name');
+  if (upn) {
+    const avatar = document.querySelector('.profile-avatar-mock');
+    if (avatar) {
+      avatar.innerText = upn.substring(0, 2).toUpperCase();
+      avatar.title = name + " (" + upn + ")";
+    }
+  }
+});
+
+// MSAL Configuration
+const msalConfig = {
+  auth: {
+    clientId: "" || localStorage.getItem('grc_reader_client_id') || "",
+    authority: "https://login.microsoftonline.com/" + ("" || "common"),
+    redirectUri: window.location.origin + window.location.pathname
+  },
+  cache: {
+    cacheLocation: "sessionStorage",
+    storeAuthStateInCookie: false
+  }
+};
+
+let msalInstance = null;
+
+function initAuth() {
+  const loadingState = document.getElementById('loginLoadingState');
+  const promptSection = document.getElementById('loginPromptSection');
+  const errorMsg = document.getElementById('loginErrorMessage');
+  const manualLink = document.getElementById('manualIdLink');
+  
+  if (!msalConfig.auth.clientId) {
+    if (loadingState) loadingState.style.display = 'none';
+    errorMsg.innerText = "Konfigurationsfehler: Die Client-ID für die Reader-App (vars.CAG_READER_CLIENT_ID) wurde in GitHub nicht gefunden oder ist leer.";
+    errorMsg.style.display = 'block';
+    if (manualLink) manualLink.style.display = 'inline-block';
+    return;
+  }
+  
+  try {
+    if (typeof msal === 'undefined') {
+      throw new Error("Das MSAL.js SDK konnte nicht geladen werden (möglicherweise blockiert ein AdBlocker oder eine Firewall CDN-Verbindungen).");
+    }
+    
+    msalInstance = new msal.PublicClientApplication(msalConfig);
+    msalInstance.handleRedirectPromise().then(response => {
+      if (response !== null) {
+        localStorage.setItem('grc_user_upn', response.account.username);
+        localStorage.setItem('grc_user_name', response.account.name);
+        showAppContent();
+      } else {
+        checkAuth();
+      }
+    }).catch(error => {
+      console.error(error);
+      if (loadingState) loadingState.style.display = 'none';
+      errorMsg.innerText = "Fehler bei Authentifizierung: " + error.message;
+      errorMsg.style.display = 'block';
+      if (promptSection) promptSection.style.display = 'block';
+      if (manualLink) manualLink.style.display = 'inline-block';
+    });
+  } catch (e) {
+    console.error("MSAL initialization failed", e);
+    if (loadingState) loadingState.style.display = 'none';
+    errorMsg.innerText = "MSAL-Fehler bei Initialisierung: " + e.message;
+    errorMsg.style.display = 'block';
+    if (manualLink) manualLink.style.display = 'inline-block';
+  }
+}
+
+function checkAuth() {
+  const loadingState = document.getElementById('loginLoadingState');
+  const promptSection = document.getElementById('loginPromptSection');
+  const manualLink = document.getElementById('manualIdLink');
+  
+  if (!msalInstance) return;
+  const accounts = msalInstance.getAllAccounts();
+  if (accounts.length === 0) {
+    if (loadingState) loadingState.style.display = 'none';
+    if (promptSection) promptSection.style.display = 'block';
+    if (manualLink) manualLink.style.display = 'inline-block';
+  } else {
+    localStorage.setItem('grc_user_upn', accounts[0].username);
+    localStorage.setItem('grc_user_name', accounts[0].name);
+    showAppContent();
+  }
+}
+
+function login() {
+  const customId = document.getElementById('customClientId') ? document.getElementById('customClientId').value.trim() : null;
+  if (customId) {
+    localStorage.setItem('grc_reader_client_id', customId);
+    msalConfig.auth.clientId = customId;
+    initAuth();
+    return;
+  }
+  
+  if (!msalConfig.auth.clientId) {
+    alert("Bitte trage eine gültige Client ID (App Registration ID) ein.");
+    return;
+  }
+  
+  msalInstance.loginRedirect({
+    scopes: ["User.Read"]
+  });
+}
+
+function toggleManualId() {
+  const section = document.getElementById('clientIdConfigSection');
+  if (section.style.display === 'none') {
+    section.style.display = 'block';
+    document.getElementById('loginErrorMessage').style.display = 'none';
+    document.getElementById('loginButton').style.display = 'block';
+  } else {
+    section.style.display = 'none';
+  }
+}
+
+function showAppContent() {
+  document.querySelector('.app').style.display = 'flex';
+  document.getElementById('loginLockScreen').style.display = 'none';
+  
+  const upn = localStorage.getItem('grc_user_upn');
+  const name = localStorage.getItem('grc_user_name');
+  if (upn) {
+    const avatar = document.querySelector('.profile-avatar-mock');
+    if (avatar) {
+      let initials = "AD";
+      if (name) {
+        const parts = name.split(' ');
+        if (parts.length >= 2) {
+          initials = (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        } else if (name.length >= 2) {
+          initials = name.substring(0, 2).toUpperCase();
+        }
+      } else if (upn) {
+        initials = upn.substring(0, 2).toUpperCase();
+      }
+      avatar.innerText = initials;
+      avatar.title = name + " (" + upn + ")";
+    }
+    
+    const dName = document.getElementById('profileUserName');
+    if (dName) dName.innerText = name || "Angemeldet";
+    const dEmail = document.getElementById('profileUserEmail');
+    if (dEmail) dEmail.innerText = upn || "";
+  }
+}
+
+function toggleProfileDropdown() {
+  const dropdown = document.getElementById('profileDropdown');
+  if (dropdown) {
+    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+  }
+}
+
+function logout() {
+  localStorage.removeItem('grc_user_upn');
+  localStorage.removeItem('grc_user_name');
+  if (msalInstance) {
+    msalInstance.logoutRedirect();
+  } else {
+    window.location.reload();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initAuth();
+});
+
+document.addEventListener('click', function(e) {
+  const container = document.querySelector('.profile-menu-container');
+  const dropdown = document.getElementById('profileDropdown');
+  if (dropdown && container && !container.contains(e.target)) {
+    dropdown.style.display = 'none';
+  }
+});
+</script>
+
+<div id="loginLockScreen" style="display:flex; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#0f172a; color:white; align-items:center; justify-content:center; flex-direction:column; z-index:99999; font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <div style="background:#1e293b; padding:40px; border-radius:12px; box-shadow:0 10px 25px -5px rgba(0,0,0,0.3); border:1px solid #334155; text-align:center; max-width:420px; width:90%;">
+    <div style="font-size:48px; margin-bottom:20px;">🛡️</div>
+    <h2 style="font-size:24px; font-weight:700; margin-bottom:12px; color:#ffffff;">Agent GRC</h2>
+    
+    <div id="loginLoadingState" style="margin-bottom:20px; color:#94a3b8; font-size:14px;">
+      <div style="display:inline-block; width:24px; height:24px; border:3px solid rgba(255,255,255,0.3); border-radius:50%; border-top-color:#fff; animation:spin 1s ease-in-out infinite; margin-bottom:12px;"></div>
+      <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+      <div>Sicherheitsprüfung wird geladen...</div>
+    </div>
+
+    <div id="loginPromptSection" style="display:none;">
+      <p style="color:#94a3b8; font-size:14px; margin-bottom:24px; line-height:1.5;">Bitte melde dich mit deinem Microsoft 365 Unternehmenskonto an, um das Governance-Dashboard anzuzeigen.</p>
+      <button id="loginButton" onclick="login()" style="background:#4f46e5; color:white; border:none; padding:12px 24px; font-size:15px; font-weight:600; border-radius:8px; cursor:pointer; width:100%; transition:background 0.2s; margin-bottom:16px;">Mit Microsoft 365 anmelden</button>
+    </div>
+    
+    <div id="loginErrorMessage" style="display:none; color:#f87171; font-size:13px; margin-bottom:20px; line-height:1.5; text-align:left; background:#7f1d1d; padding:12px; border-radius:6px; border:1px solid #b91c1c;"></div>
+
+    <div id="clientIdConfigSection" style="display:none; margin-bottom:20px; text-align:left; background:#0f172a; padding:16px; border-radius:8px; border:1px solid #334155;">
+      <label style="display:block; font-size:11px; font-weight:600; color:#94a3b8; margin-bottom:6px; text-transform:uppercase;">Reader Client ID erforderlich</label>
+      <input type="text" id="customClientId" placeholder="00000000-0000-0000-0000-000000000000" style="width:100%; padding:10px; background:#1e293b; border:1px solid #475569; color:white; border-radius:6px; font-size:13px; box-sizing:border-box; margin-bottom:8px;">
+      <span style="font-size:11px; color:#64748b; line-height:1.4; display:block;">Trage hier die ClientID deiner Reader-App-Registrierung aus deinem Tenant ein.</span>
+    </div>
+    
+    <a href="#" id="manualIdLink" onclick="toggleManualId(); return false;" style="color:#64748b; font-size:12px; text-decoration:underline; display:none; margin-top:12px;">Client-ID manuell konfigurieren</a>
+  </div>
+</div>
+
+</body>
+</html>

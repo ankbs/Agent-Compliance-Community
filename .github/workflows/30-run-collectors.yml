@@ -1,0 +1,55 @@
+name: 30 - Run Collectors
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+  TENANT_ID: ${{ vars.TENANT_ID }}
+  TENANT_DOMAIN: ${{ vars.TENANT_DOMAIN }}
+  AUTHORIZED_READER_UPN: ${{ vars.AUTHORIZED_READER_UPN }}
+  AUTHORIZED_STATUS_ADMIN_UPN: ${{ vars.AUTHORIZED_STATUS_ADMIN_UPN }}
+  AUTHORIZED_CHANGE_ADMIN_UPN: ${{ vars.AUTHORIZED_CHANGE_ADMIN_UPN }}
+  CAG_READER_CLIENT_ID: ${{ secrets.CAG_READER_CLIENT_ID }}
+  CAG_READER_CERTIFICATE_BASE64: ${{ secrets.CAG_READER_CERTIFICATE_BASE64 }}
+  CAG_READER_CERTIFICATE_PASSWORD: ${{ secrets.CAG_READER_CERTIFICATE_PASSWORD }}
+
+jobs:
+  collect:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare runner modules
+        shell: pwsh
+        run: ./scripts/requirements/Test-WorkerRequirements.ps1
+      - name: Run collectors
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $collectors = @(
+            './scripts/collectors/Get-AgentRegistryData.ps1',
+            './scripts/collectors/Get-DomainReadinessData.ps1',
+            './scripts/collectors/Get-CopilotUsageReport.ps1',
+            './scripts/collectors/Get-CopilotStudioConsumption.ps1',
+            './scripts/collectors/Get-PowerPlatformAgentLimits.ps1',
+            './scripts/collectors/Get-M365BillingPolicies.ps1',
+            './scripts/collectors/Get-AzureCostUsage.ps1'
+          )
+          foreach ($collector in $collectors) {
+            Write-Host "Running collector: $collector" -ForegroundColor Cyan
+            & $collector
+          }
+          if (-not (Test-Path 'data/raw')) { throw 'Collector output folder data/raw was not created.' }
+          $rawFiles = @(Get-ChildItem 'data/raw' -Filter '*.json' -File)
+          if ($rawFiles.Count -eq 0) { throw 'No collector JSON files were created in data/raw.' }
+          $rawFiles | Select-Object Name, Length | Format-Table -AutoSize
+      - name: Upload raw collector artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: raw-agent-compliance-data
+          path: data/raw/*.json
+          retention-days: 14

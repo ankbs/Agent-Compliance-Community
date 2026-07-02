@@ -1,0 +1,10 @@
+.DS_Store
+node_modules/
+.env
+*.pfx
+*.cer
+data/raw/*.json
+data/processed/*.json
+data/reports/*.html
+
+.out/

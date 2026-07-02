@@ -1,0 +1,47 @@
+name: 70 - Billing Change Action
+
+on:
+  workflow_dispatch:
+    inputs:
+      targetId:
+        description: Billing policy, agent or limit identifier
+        required: true
+      action:
+        description: Action to perform
+        type: choice
+        options:
+          - budget-change
+          - limit-change
+        required: true
+      budgetLimit:
+        description: New budget limit value
+        required: false
+        default: '1000'
+      initiatorUpn:
+        description: UPN of the user triggering the action
+        required: true
+      dryRun:
+        description: Dry run only
+        type: boolean
+        default: true
+
+jobs:
+  billing-change:
+    runs-on: windows-latest
+    environment: billing-change-approval
+    env:
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+      TENANT_ID: ${{ vars.TENANT_ID }}
+      CAG_BILLING_CLIENT_ID: ${{ secrets.CAG_BILLING_CLIENT_ID }}
+      CAG_BILLING_CERTIFICATE_BASE64: ${{ secrets.CAG_BILLING_CERTIFICATE_BASE64 }}
+      CAG_BILLING_CERTIFICATE_PASSWORD: ${{ secrets.CAG_BILLING_CERTIFICATE_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Execute billing or limit change
+        shell: pwsh
+        run: |
+          if ('${{ inputs.action }}' -eq 'budget-change') {
+            ./scripts/actions/Invoke-BillingBudgetChange.ps1 -TargetId '${{ inputs.targetId }}' -BudgetLimit [double](${{ inputs.budgetLimit }}) -InitiatorUpn '${{ inputs.initiatorUpn }}' -DryRun:${{ inputs.dryRun }}
+          } else {
+            ./scripts/actions/Invoke-AgentLimitChange.ps1 -TargetId '${{ inputs.targetId }}' -DryRun:${{ inputs.dryRun }}
+          }

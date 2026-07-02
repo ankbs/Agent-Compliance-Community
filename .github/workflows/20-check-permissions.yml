@@ -1,0 +1,128 @@
+name: 20 - Check Permissions
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_certificate_secret_checks:
+        description: Skip certificate secret checks for dry configuration testing
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+  TENANT_ID: ${{ vars.TENANT_ID }}
+  TENANT_DOMAIN: ${{ vars.TENANT_DOMAIN }}
+  AUTHORIZED_READER_UPN: ${{ vars.AUTHORIZED_READER_UPN }}
+  AUTHORIZED_STATUS_ADMIN_UPN: ${{ vars.AUTHORIZED_STATUS_ADMIN_UPN }}
+  AUTHORIZED_CHANGE_ADMIN_UPN: ${{ vars.AUTHORIZED_CHANGE_ADMIN_UPN }}
+
+jobs:
+  reader-check:
+    name: Reader App checks
+    runs-on: windows-latest
+    env:
+      CAG_READER_CLIENT_ID: ${{ secrets.CAG_READER_CLIENT_ID }}
+      CAG_READER_CERTIFICATE_BASE64: ${{ secrets.CAG_READER_CERTIFICATE_BASE64 }}
+      CAG_READER_CERTIFICATE_PASSWORD: ${{ secrets.CAG_READER_CERTIFICATE_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Reader checks
+        shell: pwsh
+        run: |
+          $params = @{
+            AppProfile = 'Reader'
+            OutputPath = 'data/processed/permission-checks/reader.json'
+          }
+          if ('${{ inputs.skip_certificate_secret_checks }}' -eq 'true') {
+            $params.SkipCertificateSecretChecks = $true
+          }
+          ./scripts/checks/Test-AppProfileAccess.ps1 @params
+      - name: Add Reader summary
+        if: always()
+        shell: pwsh
+        run: |
+          if (Test-Path 'data/reports/permission-checks/reader.md') {
+            Get-Content 'data/reports/permission-checks/reader.md' | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: reader-permission-checks
+          path: |
+            data/processed/permission-checks/reader.json
+            data/reports/permission-checks/reader.md
+
+  status-check:
+    name: Agent Status Action App checks
+    runs-on: windows-latest
+    env:
+      CAG_STATUS_CLIENT_ID: ${{ secrets.CAG_STATUS_CLIENT_ID }}
+      CAG_STATUS_CERTIFICATE_BASE64: ${{ secrets.CAG_STATUS_CERTIFICATE_BASE64 }}
+      CAG_STATUS_CERTIFICATE_PASSWORD: ${{ secrets.CAG_STATUS_CERTIFICATE_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Status Action checks
+        shell: pwsh
+        run: |
+          $params = @{
+            AppProfile = 'AgentStatusAction'
+            OutputPath = 'data/processed/permission-checks/agent-status-action.json'
+          }
+          if ('${{ inputs.skip_certificate_secret_checks }}' -eq 'true') {
+            $params.SkipCertificateSecretChecks = $true
+          }
+          ./scripts/checks/Test-AppProfileAccess.ps1 @params
+      - name: Add Status Action summary
+        if: always()
+        shell: pwsh
+        run: |
+          if (Test-Path 'data/reports/permission-checks/agent-status-action.md') {
+            Get-Content 'data/reports/permission-checks/agent-status-action.md' | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: status-action-permission-checks
+          path: |
+            data/processed/permission-checks/agent-status-action.json
+            data/reports/permission-checks/agent-status-action.md
+
+  billing-check:
+    name: Billing Change App checks
+    runs-on: windows-latest
+    env:
+      CAG_BILLING_CLIENT_ID: ${{ secrets.CAG_BILLING_CLIENT_ID }}
+      CAG_BILLING_CERTIFICATE_BASE64: ${{ secrets.CAG_BILLING_CERTIFICATE_BASE64 }}
+      CAG_BILLING_CERTIFICATE_PASSWORD: ${{ secrets.CAG_BILLING_CERTIFICATE_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Billing Change checks
+        shell: pwsh
+        run: |
+          $params = @{
+            AppProfile = 'BillingChange'
+            OutputPath = 'data/processed/permission-checks/billing-change.json'
+          }
+          if ('${{ inputs.skip_certificate_secret_checks }}' -eq 'true') {
+            $params.SkipCertificateSecretChecks = $true
+          }
+          ./scripts/checks/Test-AppProfileAccess.ps1 @params
+      - name: Add Billing Change summary
+        if: always()
+        shell: pwsh
+        run: |
+          if (Test-Path 'data/reports/permission-checks/billing-change.md') {
+            Get-Content 'data/reports/permission-checks/billing-change.md' | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: billing-change-permission-checks
+          path: |
+            data/processed/permission-checks/billing-change.json
+            data/reports/permission-checks/billing-change.md

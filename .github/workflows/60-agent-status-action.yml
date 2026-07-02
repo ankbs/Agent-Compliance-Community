@@ -1,0 +1,44 @@
+name: 60 - Agent Status Action
+
+on:
+  workflow_dispatch:
+    inputs:
+      targetId:
+        description: Agent identifier
+        required: true
+      action:
+        description: Action to perform
+        type: choice
+        options:
+          - stop
+          - block
+          - activate
+        required: true
+      initiatorUpn:
+        description: UPN of the user triggering the action
+        required: true
+      dryRun:
+        description: Dry run only
+        type: boolean
+        default: true
+
+jobs:
+  status-action:
+    runs-on: windows-latest
+    environment: agent-status-approval
+    env:
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+      TENANT_ID: ${{ vars.TENANT_ID }}
+      CAG_STATUS_CLIENT_ID: ${{ secrets.CAG_STATUS_CLIENT_ID }}
+      CAG_STATUS_CERTIFICATE_BASE64: ${{ secrets.CAG_STATUS_CERTIFICATE_BASE64 }}
+      CAG_STATUS_CERTIFICATE_PASSWORD: ${{ secrets.CAG_STATUS_CERTIFICATE_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Execute status action
+        shell: pwsh
+        run: |
+          if ('${{ inputs.action }}' -eq 'stop') {
+            ./scripts/actions/Invoke-AgentStop.ps1 -TargetId '${{ inputs.targetId }}' -InitiatorUpn '${{ inputs.initiatorUpn }}' -DryRun:${{ inputs.dryRun }}
+          } else {
+            ./scripts/actions/Invoke-AgentBlock.ps1 -TargetId '${{ inputs.targetId }}' -Action '${{ inputs.action }}' -InitiatorUpn '${{ inputs.initiatorUpn }}' -DryRun:${{ inputs.dryRun }}
+          }

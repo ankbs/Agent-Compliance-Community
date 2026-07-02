@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agent Compliance Community Setup</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --text: #182033;
+      --muted: #667085;
+      --border: #d9dee8;
+      --primary: #3b3f8f;
+      --primary-2: #eef0ff;
+      --danger: #b42318;
+      --warning: #b54708;
+      --success: #027a48;
+      --code: #101828;
+      --red: #d71920;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: linear-gradient(180deg, #ffffff 0%, var(--bg) 220px);
+    }
+
+    header {
+      padding: 28px 36px 22px 36px;
+      border-bottom: 4px solid var(--red);
+      background: #fff;
+    }
+
+    .brand { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+    .logo {
+      width: 54px; height: 54px; border-radius: 14px;
+      background: linear-gradient(135deg, #242b80, #5e65c7);
+      color: #fff; font-weight: 800; display: grid; place-items: center;
+      font-size: 23px; letter-spacing: -1px;
+    }
+
+    h1 { margin: 0; font-size: 30px; }
+    .subtitle { margin: 6px 0 0 0; color: var(--muted); max-width: 1120px; line-height: 1.45; }
+
+    main { display: grid; grid-template-columns: 320px 1fr; gap: 20px; padding: 24px 36px 50px 36px; }
+    nav { position: sticky; top: 20px; align-self: start; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 16px; box-shadow: 0 10px 30px rgba(16,24,40,.06); }
+    nav a { display: block; text-decoration: none; color: var(--text); padding: 10px 12px; border-radius: 10px; margin: 4px 0; font-weight: 600; }
+    nav a:hover { background: var(--primary-2); color: var(--primary); }
+
+    section { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 22px; margin-bottom: 18px; box-shadow: 0 10px 30px rgba(16,24,40,.05); }
+    h2 { margin: 0 0 12px 0; font-size: 22px; }
+    h3 { margin: 20px 0 8px 0; font-size: 17px; }
+    p, li { line-height: 1.55; }
+
+    .notice { border-left: 5px solid var(--primary); background: var(--primary-2); padding: 12px 14px; border-radius: 10px; margin: 12px 0; }
+    .warning { border-left-color: var(--warning); background: #fffaeb; }
+    .danger { border-left-color: var(--danger); background: #fef3f2; }
+    .success { border-left-color: var(--success); background: #ecfdf3; }
+
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(240px, 1fr)); gap: 14px; }
+    label { display: block; font-weight: 700; margin-bottom: 6px; }
+    .help { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+    input, select, textarea { width: 100%; border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px; font: inherit; background: #fff; }
+    textarea { min-height: 120px; font-family: Consolas, Monaco, monospace; }
+    .field { margin-bottom: 14px; }
+
+    button { border: none; background: var(--primary); color: #fff; padding: 11px 16px; border-radius: 10px; cursor: pointer; font-weight: 700; margin: 4px 6px 4px 0; }
+    button.secondary { background: #344054; }
+    button.red { background: var(--red); }
+    button.green { background: var(--success); }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+
+    pre { background: var(--code); color: #f2f4f7; border-radius: 14px; padding: 16px; overflow-x: auto; white-space: pre-wrap; line-height: 1.45; border: 1px solid #344054; }
+    code { background: #f2f4f7; padding: 2px 5px; border-radius: 5px; }
+
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+    th, td { border-bottom: 1px solid var(--border); padding: 10px; text-align: left; vertical-align: top; }
+    th { background: #f9fafb; }
+    .pill { display: inline-block; border-radius: 999px; padding: 3px 9px; font-size: 12px; font-weight: 800; }
+    .pill.read { background: #e6f4ff; color: #175cd3; }
+    .pill.status { background: #fff4e5; color: #b54708; }
+    .pill.billing { background: #fef3f2; color: #b42318; }
+    .pill.auto { background: #ecfdf3; color: #027a48; }
+
+    .copyRow { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .copyRow button { flex: 0 0 auto; }
+    .statusBox { background: #f9fafb; border: 1px solid var(--border); border-radius: 14px; padding: 12px; margin-top: 10px; min-height: 70px; }
+    .statusLine { font-family: Consolas, Monaco, monospace; font-size: 13px; margin: 5px 0; }
+
+    @media (max-width: 980px) {
+      main { grid-template-columns: 1fr; padding: 18px; }
+      nav { position: relative; top: 0; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="logo">P3</div>
+    <div>
+      <h1>Agent Compliance Community Setup</h1>
+      <p class="subtitle">Self-Service-Assistent für die Community Edition. Diese Seite kann lokal oder als GitHub Page laufen, Eingaben automatisch aus URL-Parametern übernehmen, GitHub Repository Variables setzen und die ersten GitHub Actions Workflows starten.</p>
+    </div>
+  </div>
+</header>
+
+<main>
+  <nav>
+    <a href="#overview">1. Überblick</a>
+    <a href="#data">2. Daten erfassen</a>
+    <a href="#automation">3. Automatisierung</a>
+    <a href="#apps">4. App-Profile</a>
+    <a href="#generated">5. Generierte Werte</a>
+    <a href="entra-bootstrap.html">Entra App Bootstrap</a>
+    <a href="#test">6. Testablauf</a>
+    <a href="#manual">7. Grenzen</a>
+  </nav>
+
+  <div>
+    <section id="overview">
+      <h2>1. Überblick</h2>
+      <p>Der Tester startet idealerweise mit der GitHub Page dieses Repositorys. Die Seite erkennt Owner/Repository, kann Werte aus URL-Parametern vorbefüllen und optional die GitHub Actions API nutzen, um Setup-Variablen zu speichern und Workflows zu starten.</p>
+      <div class="notice danger"><strong>Wichtig:</strong> Im MOC werden keine Exchange-Online-Berechtigungen, keine Mailbox-Zugriffe, kein <code>Exchange.ManageAsApp</code> und keine Exchange Online PowerShell verwendet.</div>
+      <div class="notice"><strong>Worker-first:</strong> Microsoft PowerShell-Module werden nicht lokal auf dem Client installiert. Requirements, Checks, Collectors und Reports laufen über GitHub Actions Runner oder Azure Cloud Shell.</div>
+      <table>
+        <thead><tr><th>App-Profil</th><th>Zweck</th><th>Änderungen</th></tr></thead>
+        <tbody>
+          <tr><td><span class="pill read">Reader</span></td><td>Copilot-, Agent-, KI-, Verbrauchs-, Kosten- und Governance-Daten lesen</td><td>Nein</td></tr>
+          <tr><td><span class="pill status">Status Action</span></td><td>Agent stoppen, blockieren, deaktivieren, Review starten</td><td>Nur mit Freigabe</td></tr>
+          <tr><td><span class="pill billing">Billing Change</span></td><td>Budgets, Limits, Billing Policies und PAYG-nahe Änderungen</td><td>Nur mit Dry-Run, Freigabe und Audit</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="data">
+      <h2>2. Daten erfassen</h2>
+      <div class="grid">
+        <div class="field"><label for="githubOwner">GitHub Owner</label><input id="githubOwner" value="MKN1411" /><div class="help">Wird auf GitHub Pages automatisch aus der URL erkannt, sofern möglich.</div></div>
+        <div class="field"><label for="githubRepo">GitHub Repository</label><input id="githubRepo" value="Agent-Compliance" /></div>
+        <div class="field"><label for="tenantId">Tenant ID</label><input id="tenantId" placeholder="33a9ca10-7495-4979-a097-cbdf74c7686f" /></div>
+        <div class="field"><label for="tenantDomain">Tenant Domain</label><input id="tenantDomain" placeholder="contoso.onmicrosoft.com" /></div>
+        <div class="field"><label for="readerUpn">Reader UPN</label><input id="readerUpn" placeholder="reader@contoso.com" /></div>
+        <div class="field"><label for="statusAdminUpn">Status Admin UPN</label><input id="statusAdminUpn" placeholder="ai-status-admin@contoso.com" /></div>
+        <div class="field"><label for="changeAdminUpn">Change Admin UPN</label><input id="changeAdminUpn" placeholder="billing-change-admin@contoso.com" /></div>
+        <div class="field"><label for="notificationMail">Notification Mail</label><input id="notificationMail" placeholder="m365-governance@contoso.com" /></div>
+        <div class="field"><label for="localRoot">Lokaler Repo-Pfad</label><input id="localRoot" value="%USERPROFILE%\Documents\Agent-Compliance" /></div>
+        <div class="field"><label for="mode">Testmodus</label><select id="mode"><option value="initial">Initialtest ohne App-Secrets</option><option value="full">Volltest mit App-Secrets</option></select></div>
+      </div>
+      <button onclick="generate()">Konfiguration erzeugen</button>
+      <button class="secondary" onclick="loadSample()">Beispieldaten laden</button>
+      <button class="secondary" onclick="copyDeepLink()">Setup-Link kopieren</button>
+      <div class="help">URL-Parameter werden unterstützt, z. B. <code>?tenantId=...&tenantDomain=...&readerUpn=...</code>. Dadurch kann ein Tester die Seite bereits vorausgefüllt öffnen.</div>
+    </section>
+
+    <section id="automation">
+      <h2>3. Automatisierung über GitHub Page</h2>
+      <p>Die Seite kann GitHub Repository Variables setzen und Workflows auslösen. Dafür benötigt der Tester einen kurzlebigen Fine-grained PAT für genau dieses Repository mit mindestens <strong>Variables: read/write</strong> und <strong>Actions: read/write</strong>.</p>
+      <div class="notice warning"><strong>Sicherheit:</strong> Der Token wird nicht gespeichert, nicht in die URL geschrieben und nicht ins Repository committet. Er wird nur im aktuellen Browser-Speicher für die API-Aufrufe genutzt. Nach dem Test sollte der Token in GitHub widerrufen werden.</div>
+      <div class="grid">
+        <div class="field"><label for="githubToken">GitHub PAT / Token</label><input id="githubToken" type="password" placeholder="github_pat_..." autocomplete="off" /><div class="help">Nur für automatische API-Aufrufe. Für reines Kopieren leer lassen.</div></div>
+        <div class="field"><label for="branchRef">Branch / Ref</label><input id="branchRef" value="main" /></div>
+      </div>
+      <button class="green" onclick="runAutomatedSetup()">Variablen setzen + Initial-Workflows starten</button>
+      <button onclick="setRepositoryVariables()">Nur Variables setzen</button>
+      <button onclick="dispatchBootstrapPlan()">Nur Bootstrap Plan starten</button>
+      <button onclick="dispatchRequirements()">Nur Requirements starten</button>
+      <button onclick="dispatchPermissionCheck()">Nur Permission Check starten</button>
+      <div id="automationStatus" class="statusBox"><div class="statusLine">Bereit.</div></div>
+    </section>
+
+    <section id="apps">
+      <h2>4. App-Profile und benötigte GitHub-Werte</h2>
+      <p>Die Client IDs und Zertifikate entstehen erst nach der App-Erstellung. Bis dahin kann der Permission-Check mit <code>skip_certificate_secret_checks=true</code> laufen.</p>
+      <table>
+        <thead><tr><th>Profil</th><th>Repository Variable</th><th>Repository Secrets</th></tr></thead>
+        <tbody>
+          <tr><td>Reader</td><td><code>AUTHORIZED_READER_UPN</code></td><td><code>CAG_READER_CLIENT_ID</code>, <code>CAG_READER_CERTIFICATE_BASE64</code>, <code>CAG_READER_CERTIFICATE_PASSWORD</code></td></tr>
+          <tr><td>Agent Status Action</td><td><code>AUTHORIZED_STATUS_ADMIN_UPN</code></td><td><code>CAG_STATUS_CLIENT_ID</code>, <code>CAG_STATUS_CERTIFICATE_BASE64</code>, <code>CAG_STATUS_CERTIFICATE_PASSWORD</code></td></tr>
+          <tr><td>Billing Change</td><td><code>AUTHORIZED_CHANGE_ADMIN_UPN</code></td><td><code>CAG_BILLING_CLIENT_ID</code>, <code>CAG_BILLING_CERTIFICATE_BASE64</code>, <code>CAG_BILLING_CERTIFICATE_PASSWORD</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="generated">
+      <h2>5. Generierte Werte</h2>
+      <h3>Workflow Inputs für „10 - Bootstrap Plan“</h3>
+      <div class="copyRow"><p class="help">Diese Werte werden bei der Automatisierung direkt an den Workflow gesendet.</p><button onclick="copy('bootstrapInputs')">Kopieren</button></div>
+      <pre id="bootstrapInputs">Bitte zuerst Konfiguration erzeugen.</pre>
+
+      <h3>GitHub Variables per GitHub CLI</h3>
+      <div class="copyRow"><p class="help">Fallback, falls kein Token in der Seite verwendet werden soll.</p><button onclick="copy('ghVariables')">Kopieren</button></div>
+      <pre id="ghVariables">Bitte zuerst Konfiguration erzeugen.</pre>
+
+      <h3>GitHub Secrets - Platzhalter</h3>
+      <div class="copyRow"><p class="help">Diese Secrets werden nach App-Erstellung/Zertifikatserzeugung gesetzt. Werte niemals committen.</p><button onclick="copy('ghSecrets')">Kopieren</button></div>
+      <pre id="ghSecrets">Bitte zuerst Konfiguration erzeugen.</pre>
+
+      <h3>Admin Consent URL Vorlagen</h3>
+      <div class="copyRow"><p class="help">Client IDs erst nach App-Erstellung einsetzen.</p><button onclick="copy('consentUrls')">Kopieren</button></div>
+      <pre id="consentUrls">Bitte zuerst Konfiguration erzeugen.</pre>
+    </section>
+
+    <section id="test">
+      <h2>6. Testablauf für Tester ohne App-Secrets</h2>
+      <div class="notice warning"><strong>Initialtest:</strong> Der Tester kann bereits prüfen, ob Repo-Struktur, Workflows, Manifeste und Setup-Daten korrekt sind, auch wenn noch keine Entra Apps und Secrets existieren.</div>
+      <h3>Automatischer Ablauf</h3>
+      <ol>
+        <li>Daten erfassen oder per Setup-Link vorausfüllen.</li>
+        <li>Fine-grained GitHub PAT in das Tokenfeld einfügen.</li>
+        <li><strong>Variablen setzen + Initial-Workflows starten</strong> klicken.</li>
+        <li>In GitHub Actions die Artefakte prüfen.</li>
+      </ol>
+      <h3>Manueller Fallback</h3>
+      <ol>
+        <li><strong>10 - Bootstrap Plan</strong> mit den generierten Inputs starten.</li>
+        <li><strong>00 - Validate Worker Requirements</strong> starten. Beim ersten Lauf <code>skip_module_install=false</code>.</li>
+        <li><strong>20 - Check Permissions</strong> mit <code>skip_certificate_secret_checks=true</code> starten.</li>
+      </ol>
+      <h3>Lokaler Schnelltest</h3>
+      <div class="copyRow"><p class="help">Öffnet diese Setup-Seite lokal aus dem Repository.</p><button onclick="copy('localTest')">Kopieren</button></div>
+      <pre id="localTest">Bitte zuerst Konfiguration erzeugen.</pre>
+    </section>
+
+    <section id="manual">
+      <h2>7. Was noch nicht vollständig automatisiert ist</h2>
+      <p>Die GitHub-Seite automatisiert die Repository-Variablen und Workflow-Starts. Die Microsoft-Seite braucht weiterhin eine eigene Vertrauensstellung.</p>
+      <ul>
+        <li>Entra App Registrations für Reader, Status Action und Billing Change erstellen.</li>
+        <li>API Permissions je App-Profil gemäß Manifest hinzufügen.</li>
+        <li>Admin Consent bewusst erteilen.</li>
+        <li>Zertifikate erzeugen und Public Certificate an App Registration hängen.</li>
+        <li>Client IDs und Zertifikatswerte als GitHub Secrets setzen.</li>
+      </ul>
+      <div class="notice success">Entra App Bootstrap ist über <code>setup/entra-bootstrap.html</code> verfügbar. Der Admin erhält dort einen Invoke-Befehl, der App Registrations erstellt und Admin-Consent-Links ausgibt.</div>
+    </section>
+  </div>
+</main>
+
+<script>
+  const ids = ['githubOwner','githubRepo','tenantId','tenantDomain','readerUpn','statusAdminUpn','changeAdminUpn','notificationMail','localRoot','mode','branchRef'];
+
+  function v(id) { return document.getElementById(id).value.trim(); }
+  function esc(s) { return String(s || '').replace(/`/g, '``').replace(/"/g, '\\"'); }
+  function log(msg) {
+    const box = document.getElementById('automationStatus');
+    const line = document.createElement('div');
+    line.className = 'statusLine';
+    line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+    box.appendChild(line);
+  }
+  function resetLog() { document.getElementById('automationStatus').innerHTML = ''; }
+
+  function inferRepoFromPagesUrl() {
+    const host = window.location.hostname;
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    if (host.endsWith('.github.io')) {
+      const owner = host.replace('.github.io', '');
+      if (owner) document.getElementById('githubOwner').value = owner;
+      if (pathParts.length > 0) document.getElementById('githubRepo').value = pathParts[0];
+    }
+  }
+
+  function applyQueryParameters() {
+    const params = new URLSearchParams(window.location.search);
+    const map = {
+      githubOwner: 'githubOwner', owner: 'githubOwner',
+      githubRepo: 'githubRepo', repo: 'githubRepo',
+      tenantId: 'tenantId', tenant_id: 'tenantId',
+      tenantDomain: 'tenantDomain', tenant_domain: 'tenantDomain',
+      readerUpn: 'readerUpn', reader_upn: 'readerUpn',
+      statusAdminUpn: 'statusAdminUpn', status_admin_upn: 'statusAdminUpn',
+      changeAdminUpn: 'changeAdminUpn', change_admin_upn: 'changeAdminUpn',
+      notificationMail: 'notificationMail', notification_mail: 'notificationMail',
+      mode: 'mode', branchRef: 'branchRef', ref: 'branchRef'
+    };
+    for (const [key, target] of Object.entries(map)) {
+      if (params.has(key)) document.getElementById(target).value = params.get(key);
+    }
+  }
+
+  function persistForm() {
+    const data = {};
+    ids.forEach(id => data[id] = v(id));
+    localStorage.setItem('agentComplianceSetupForm', JSON.stringify(data));
+  }
+
+  function restoreForm() {
+    try {
+      const raw = localStorage.getItem('agentComplianceSetupForm');
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      ids.forEach(id => { if (data[id]) document.getElementById(id).value = data[id]; });
+    } catch { /* ignore */ }
+  }
+
+  function getModel() {
+    const owner = v('githubOwner') || 'MKN1411';
+    const repo = v('githubRepo') || 'Agent-Compliance';
+    const full = `${owner}/${repo}`;
+    const tenantId = v('tenantId');
+    const tenantDomain = v('tenantDomain');
+    const reader = v('readerUpn');
+    const status = v('statusAdminUpn');
+    const change = v('changeAdminUpn');
+    const mail = v('notificationMail');
+    const localRoot = v('localRoot');
+    const skipSecrets = v('mode') === 'initial' ? 'true' : 'false';
+    const ref = v('branchRef') || 'main';
+    return { owner, repo, full, tenantId, tenantDomain, reader, status, change, mail, localRoot, skipSecrets, ref };
+  }
+
+  function loadSample() {
+    document.getElementById('tenantId').value = '00000000-0000-0000-0000-000000000000';
+    document.getElementById('tenantDomain').value = 'contoso.onmicrosoft.com';
+    document.getElementById('readerUpn').value = 'reader@contoso.com';
+    document.getElementById('statusAdminUpn').value = 'ai-status-admin@contoso.com';
+    document.getElementById('changeAdminUpn').value = 'billing-change-admin@contoso.com';
+    document.getElementById('notificationMail').value = 'm365-governance@contoso.com';
+    generate();
+  }
+
+  function generate() {
+    persistForm();
+    const m = getModel();
+    const inputs = {
+      tenant_id: m.tenantId,
+      tenant_domain: m.tenantDomain,
+      reader_upn: m.reader,
+      status_admin_upn: m.status,
+      change_admin_upn: m.change,
+      notification_mail: m.mail
+    };
+    document.getElementById('bootstrapInputs').textContent = JSON.stringify(inputs, null, 2);
+    document.getElementById('ghVariables').textContent = [
+      `gh variable set TENANT_ID --repo ${m.full} --body "${esc(m.tenantId)}"`,
+      `gh variable set TENANT_DOMAIN --repo ${m.full} --body "${esc(m.tenantDomain)}"`,
+      `gh variable set AUTHORIZED_READER_UPN --repo ${m.full} --body "${esc(m.reader)}"`,
+      `gh variable set AUTHORIZED_STATUS_ADMIN_UPN --repo ${m.full} --body "${esc(m.status)}"`,
+      `gh variable set AUTHORIZED_CHANGE_ADMIN_UPN --repo ${m.full} --body "${esc(m.change)}"`,
+      `gh variable set NOTIFICATION_MAIL --repo ${m.full} --body "${esc(m.mail)}"`,
+      `gh variable set FEATURE_EXCHANGE_ONLINE --repo ${m.full} --body "false"`,
+      `gh variable set FEATURE_COPILOT_USAGE_READ --repo ${m.full} --body "true"`,
+      `gh variable set FEATURE_AGENT365_REGISTRY_READ --repo ${m.full} --body "true"`,
+      `gh variable set FEATURE_COPILOT_STUDIO_CONSUMPTION_READ --repo ${m.full} --body "true"`,
+      `gh variable set FEATURE_M365_PAYG_BILLING_READ --repo ${m.full} --body "true"`
+    ].join('\n');
+    document.getElementById('ghSecrets').textContent = [
+      '# Nach App-Erstellung und Zertifikatserzeugung setzen:',
+      `gh secret set CAG_READER_CLIENT_ID --repo ${m.full}`,
+      `gh secret set CAG_READER_CERTIFICATE_BASE64 --repo ${m.full}`,
+      `gh secret set CAG_READER_CERTIFICATE_PASSWORD --repo ${m.full}`,
+      '',
+      `gh secret set CAG_STATUS_CLIENT_ID --repo ${m.full}`,
+      `gh secret set CAG_STATUS_CERTIFICATE_BASE64 --repo ${m.full}`,
+      `gh secret set CAG_STATUS_CERTIFICATE_PASSWORD --repo ${m.full}`,
+      '',
+      `gh secret set CAG_BILLING_CLIENT_ID --repo ${m.full}`,
+      `gh secret set CAG_BILLING_CERTIFICATE_BASE64 --repo ${m.full}`,
+      `gh secret set CAG_BILLING_CERTIFICATE_PASSWORD --repo ${m.full}`
+    ].join('\n');
+    document.getElementById('consentUrls').textContent = [
+      `Reader App: https://login.microsoftonline.com/${m.tenantId || '{tenant-id}'}/adminconsent?client_id={reader-client-id}`,
+      `Status Action App: https://login.microsoftonline.com/${m.tenantId || '{tenant-id}'}/adminconsent?client_id={status-client-id}`,
+      `Billing Change App: https://login.microsoftonline.com/${m.tenantId || '{tenant-id}'}/adminconsent?client_id={billing-client-id}`
+    ].join('\n');
+    document.getElementById('localTest').textContent = [
+      `Set-Location "${m.localRoot}"`,
+      'git pull',
+      'Invoke-Item .\\setup\\index.html',
+      '',
+      '# GitHub Actions Testreihenfolge:',
+      '# 1. 10 - Bootstrap Plan mit den generierten Inputs starten',
+      '# 2. 00 - Validate Worker Requirements starten',
+      `# 3. 20 - Check Permissions mit skip_certificate_secret_checks=${m.skipSecrets} starten`
+    ].join('\n');
+  }
+
+  function validateAutomation() {
+    const token = document.getElementById('githubToken').value.trim();
+    if (!token) throw new Error('GitHub Token fehlt. Für Automatisierung bitte PAT einfügen.');
+    const m = getModel();
+    const missing = [];
+    if (!m.owner) missing.push('GitHub Owner');
+    if (!m.repo) missing.push('GitHub Repository');
+    if (!m.tenantId) missing.push('Tenant ID');
+    if (!m.tenantDomain) missing.push('Tenant Domain');
+    if (!m.reader) missing.push('Reader UPN');
+    if (!m.status) missing.push('Status Admin UPN');
+    if (!m.change) missing.push('Change Admin UPN');
+    if (!m.mail) missing.push('Notification Mail');
+    if (missing.length) throw new Error('Pflichtwerte fehlen: ' + missing.join(', '));
+    return { token, model: m };
+  }
+
+  async function ghRequest(method, url, token, body) {
+    const res = await fetch(url, {
+      method,
+      headers: {
+        'Accept': 'application/vnd.github+json',
+        'Authorization': `Bearer ${token}`,
+        'X-GitHub-Api-Version': '2022-11-28',
+        ...(body ? {'Content-Type': 'application/json'} : {})
+      },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    if (!res.ok && res.status !== 204) {
+      let text = await res.text();
+      throw new Error(`${method} ${url} failed: ${res.status} ${text}`);
+    }
+    if (res.status === 204) return null;
+    try { return await res.json(); } catch { return null; }
+  }
+
+  async function upsertVariable(owner, repo, token, name, value) {
+    const base = `https://api.github.com/repos/${owner}/${repo}/actions/variables`;
+    try {
+      await ghRequest('PATCH', `${base}/${encodeURIComponent(name)}`, token, { name, value: String(value ?? '') });
+      log(`Variable aktualisiert: ${name}`);
+    } catch (e) {
+      if (!String(e.message).includes('404')) throw e;
+      await ghRequest('POST', base, token, { name, value: String(value ?? '') });
+      log(`Variable erstellt: ${name}`);
+    }
+  }
+
+  function getVariables(m) {
+    return {
+      TENANT_ID: m.tenantId,
+      TENANT_DOMAIN: m.tenantDomain,
+      AUTHORIZED_READER_UPN: m.reader,
+      AUTHORIZED_STATUS_ADMIN_UPN: m.status,
+      AUTHORIZED_CHANGE_ADMIN_UPN: m.change,
+      NOTIFICATION_MAIL: m.mail,
+      FEATURE_EXCHANGE_ONLINE: 'false',
+      FEATURE_COPILOT_USAGE_READ: 'true',
+      FEATURE_AGENT365_REGISTRY_READ: 'true',
+      FEATURE_COPILOT_STUDIO_CONSUMPTION_READ: 'true',
+      FEATURE_M365_PAYG_BILLING_READ: 'true'
+    };
+  }
+
+  async function setRepositoryVariables() {
+    resetLog(); generate();
+    const { token, model: m } = validateAutomation();
+    log(`Setze Repository Variables in ${m.full} ...`);
+    const vars = getVariables(m);
+    for (const [name, value] of Object.entries(vars)) {
+      await upsertVariable(m.owner, m.repo, token, name, value);
+    }
+    log('Repository Variables abgeschlossen.');
+  }
+
+  async function dispatchWorkflow(workflowFile, inputs = {}) {
+    const { token, model: m } = validateAutomation();
+    const url = `https://api.github.com/repos/${m.owner}/${m.repo}/actions/workflows/${encodeURIComponent(workflowFile)}/dispatches`;
+    await ghRequest('POST', url, token, { ref: m.ref, inputs });
+    log(`Workflow gestartet: ${workflowFile}`);
+  }
+
+  async function dispatchBootstrapPlan() {
+    generate(); resetLog();
+    const m = getModel();
+    await dispatchWorkflow('10-bootstrap-plan.yml', {
+      tenant_id: m.tenantId,
+      tenant_domain: m.tenantDomain,
+      reader_upn: m.reader,
+      status_admin_upn: m.status,
+      change_admin_upn: m.change,
+      notification_mail: m.mail
+    });
+  }
+
+  async function dispatchRequirements() {
+    resetLog();
+    await dispatchWorkflow('00-validate-worker-requirements.yml', { skip_module_install: 'false' });
+  }
+
+  async function dispatchPermissionCheck() {
+    resetLog();
+    const m = getModel();
+    await dispatchWorkflow('20-check-permissions.yml', { skip_certificate_secret_checks: m.skipSecrets });
+  }
+
+  async function runAutomatedSetup() {
+    resetLog(); generate();
+    try {
+      await setRepositoryVariables();
+      const m = getModel();
+      await dispatchWorkflow('10-bootstrap-plan.yml', {
+        tenant_id: m.tenantId,
+        tenant_domain: m.tenantDomain,
+        reader_upn: m.reader,
+        status_admin_upn: m.status,
+        change_admin_upn: m.change,
+        notification_mail: m.mail
+      });
+      await dispatchWorkflow('00-validate-worker-requirements.yml', { skip_module_install: 'false' });
+      await dispatchWorkflow('20-check-permissions.yml', { skip_certificate_secret_checks: m.skipSecrets });
+      log('Automatischer Initiallauf wurde gestartet. Bitte GitHub Actions öffnen und Artefakte prüfen.');
+    } catch (e) {
+      log('FEHLER: ' + e.message);
+      alert(e.message);
+    }
+  }
+
+  function copyDeepLink() {
+    generate();
+    const m = getModel();
+    const url = new URL(window.location.href);
+    url.search = '';
+    const params = url.searchParams;
+    params.set('owner', m.owner);
+    params.set('repo', m.repo);
+    params.set('tenantId', m.tenantId);
+    params.set('tenantDomain', m.tenantDomain);
+    params.set('readerUpn', m.reader);
+    params.set('statusAdminUpn', m.status);
+    params.set('changeAdminUpn', m.change);
+    params.set('notificationMail', m.mail);
+    params.set('mode', v('mode'));
+    params.set('ref', m.ref);
+    navigator.clipboard.writeText(url.toString()).then(() => alert('Setup-Link kopiert.'));
+  }
+
+  function copy(id) {
+    const text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text).then(() => alert('In die Zwischenablage kopiert.'));
+  }
+
+  ids.forEach(id => document.getElementById(id)?.addEventListener('input', generate));
+  restoreForm();
+  inferRepoFromPagesUrl();
+  applyQueryParameters();
+  generate();
+</script>
+</body>
+</html>
+
+

@@ -1,0 +1,30 @@
+{
+  "collector": "M365 Billing Policies",
+  "status": "live",
+  "generatedAt": "2026-06-29T14:16:46.3742932Z",
+  "note": "Abrechnungsrichtlinie aus lokaler Konfigurationsdatei geladen (API-Zugriff eingeschränkt).",
+  "data": {
+    "isLive": true,
+    "policies": [
+      {
+        "name": "CoPilot Abrechnung",
+        "service": "M365 Pay-as-you-go",
+        "subscriptionId": "86a917bb-3cf4-40be-ac42-1b813e729e24",
+        "subscriptionName": "Azure (MyCloudOfficeDEV)",
+        "resourceGroup": "rg-PurviewDemoStorageDEWC",
+        "resourceId": "config-override",
+        "type": "Microsoft.Commerce/billingPolicies"
+      },
+      {
+        "name": "PowerPlatformAbrechnungsplanCopilotStudio",
+        "service": "Power Platform / Copilot Studio",
+        "subscriptionId": "86a917bb-3cf4-40be-ac42-1b813e729e24",
+        "subscriptionName": "Azure (MyCloudOfficeDEV)",
+        "resourceGroup": "rg-PurviewDemoStorageDEWC",
+        "resourceId": "config-override",
+        "type": "Microsoft.Commerce/billingPolicies"
+      }
+    ],
+    "error": null
+  }
+}

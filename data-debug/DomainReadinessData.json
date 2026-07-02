@@ -1,0 +1,164 @@
+{
+  "collector": "Domain Readiness and Executive API Coverage",
+  "status": "live-partial",
+  "generatedAt": "2026-06-29T14:16:46.3058979Z",
+  "tenantId": "33a9ca10-7495-4979-a097-cbdf74c7686f",
+  "tenantDomain": "mycloudofficedev.onmicrosoft.com",
+  "probes": [
+    {
+      "domain": "M365 Admin & Copilot",
+      "capability": "Tenant organization",
+      "api": "Microsoft Graph /organization",
+      "status": "live",
+      "message": "Read access successful.",
+      "audience": "CIO/CFO",
+      "metrics": {
+        "organization": "mycloudofficedev",
+        "id": "33a9ca10-7495-4979-a097-cbdf74c7686f"
+      }
+    },
+    {
+      "domain": "M365 Admin & Copilot",
+      "capability": "Subscribed SKUs / licensing",
+      "api": "Microsoft Graph /subscribedSkus",
+      "status": "live",
+      "message": "Read access successful.",
+      "audience": "CFO/CIO",
+      "metrics": {
+        "skuCount": 7,
+        "consumedUnits": 24,
+        "enabledUnits": 20026
+      }
+    },
+    {
+      "domain": "M365 Admin & Copilot",
+      "capability": "User inventory",
+      "api": "Microsoft Graph /users",
+      "status": "live",
+      "message": "Read access successful.",
+      "audience": "CIO/CISO",
+      "metrics": {
+        "usersVisible": 26,
+        "enabledUsers": 26,
+        "guestUsers": 0
+      }
+    },
+    {
+      "domain": "Security & Governance",
+      "capability": "Groups and collaboration objects",
+      "api": "Microsoft Graph /groups",
+      "status": "live",
+      "message": "Read access successful.",
+      "audience": "CISO/CIO",
+      "metrics": {
+        "groupsVisible": 69,
+        "m365Groups": 6,
+        "securityGroups": 64
+      }
+    },
+    {
+      "domain": "Agent Registry & Governance",
+      "capability": "Application registrations",
+      "api": "Microsoft Graph /applications",
+      "status": "live",
+      "message": "Read access successful.",
+      "audience": "CISO/CIO",
+      "metrics": {
+        "applicationsVisible": 38,
+        "agentCandidates": 5
+      }
+    },
+    {
+      "domain": "Agent Registry & Governance",
+      "capability": "Service principals / Enterprise apps",
+      "api": "Microsoft Graph /servicePrincipals",
+      "status": "live",
+      "message": "Read access successful.",
+      "audience": "CISO/CIO",
+      "metrics": {
+        "servicePrincipalsVisible": 100,
+        "agentCandidates": 9,
+        "disabledServicePrincipals": 0
+      }
+    },
+    {
+      "domain": "Security & Governance",
+      "capability": "Directory roles",
+      "api": "Microsoft Graph /directoryRoles",
+      "status": "live",
+      "message": "Read access successful.",
+      "audience": "CISO",
+      "metrics": {
+        "activeDirectoryRoles": 71
+      }
+    },
+    {
+      "domain": "Security & Governance",
+      "capability": "Conditional Access policies",
+      "api": "Microsoft Graph /identity/conditionalAccess/policies",
+      "status": "live",
+      "message": "Read access successful.",
+      "audience": "CISO/CIO",
+      "metrics": {
+        "conditionalAccessPolicies": 21,
+        "enabledPolicies": 2,
+        "reportOnlyPolicies": 19
+      }
+    },
+    {
+      "domain": "M365 Usage Reporting",
+      "capability": "M365 usage report endpoints",
+      "api": "Microsoft Graph /reports",
+      "status": "not-implemented",
+      "message": "This collector is not implemented yet. No usage values are estimated or faked.",
+      "audience": "CIO/CFO",
+      "metrics": {
+        "endpoint": "getM365AppUserDetail",
+        "period": "D30",
+        "source": "not-implemented"
+      }
+    },
+    {
+      "domain": "Power Platform",
+      "capability": "Environment, app and flow inventory",
+      "api": "Power Platform Admin APIs",
+      "status": "not-implemented",
+      "message": "Power Platform API collector is not implemented yet. No values are estimated or faked.",
+      "audience": "CIO/CISO",
+      "metrics": {}
+    },
+    {
+      "domain": "Azure AI / BYO Models",
+      "capability": "Azure OpenAI, Foundry and token cost inventory",
+      "api": "Azure Resource Manager / Cost Management",
+      "status": "not-implemented",
+      "message": "Azure AI and Cost Management collector is not implemented yet. Azure RBAC and ARM token flow are required.",
+      "audience": "CFO/CIO",
+      "metrics": {}
+    },
+    {
+      "domain": "Cost & Billing",
+      "capability": "PAYG, budget and chargeback",
+      "api": "Microsoft Graph billing + Azure Cost Management",
+      "status": "partial",
+      "message": "M365 SKU data is live via Graph. PAYG, budget and Azure token costs are not implemented yet.",
+      "audience": "CFO",
+      "metrics": {
+        "m365SkuSource": "live",
+        "azureCostSource": "not-implemented"
+      }
+    },
+    {
+      "domain": "Reports",
+      "capability": "Management and detail reporting",
+      "api": "GitHub Pages / PDF rendering",
+      "status": "live",
+      "message": "Static dashboard and report pages are published. PDF rendering is attempted in workflow 40 and browser print is available.",
+      "audience": "CISO/CFO/CIO",
+      "metrics": {
+        "html": 1,
+        "pdf": "best-effort"
+      }
+    }
+  ]
+}

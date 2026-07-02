@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agent Compliance - Entra App Bootstrap</title>
+  <style>
+    :root{--bg:#f6f7fb;--panel:#fff;--text:#182033;--muted:#667085;--border:#d9dee8;--primary:#3b3f8f;--red:#d71920;--success:#027a48;--warn:#b54708;--code:#101828}
+    body{margin:0;font-family:"Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#fff 0%,var(--bg) 220px);color:var(--text)}
+    header{padding:28px 36px 22px;border-bottom:4px solid var(--red);background:#fff}.brand{display:flex;align-items:center;gap:16px}.logo{width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#242b80,#5e65c7);color:#fff;font-weight:800;display:grid;place-items:center;font-size:23px}
+    main{max-width:1180px;margin:0 auto;padding:24px 36px 50px}section{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:18px;box-shadow:0 10px 30px rgba(16,24,40,.05)}
+    h1{margin:0;font-size:30px}h2{margin-top:0}p,li{line-height:1.55}.help{color:var(--muted);font-size:13px}.grid{display:grid;grid-template-columns:repeat(2,minmax(240px,1fr));gap:14px}.field{margin-bottom:14px}
+    label{display:block;font-weight:700;margin-bottom:6px}input{width:100%;border:1px solid var(--border);border-radius:10px;padding:11px 12px;font:inherit}
+    button{border:0;background:var(--primary);color:#fff;padding:11px 16px;border-radius:10px;cursor:pointer;font-weight:700;margin:4px 6px 4px 0}button.green{background:var(--success)}
+    pre{background:var(--code);color:#f2f4f7;border-radius:14px;padding:16px;overflow-x:auto;white-space:pre-wrap;line-height:1.45}.notice{border-left:5px solid var(--primary);background:#eef0ff;padding:12px 14px;border-radius:10px;margin:12px 0}.warning{border-left-color:var(--warn);background:#fffaeb}.success{border-left-color:var(--success);background:#ecfdf3}.danger{border-left-color:#b42318;background:#fef3f2}
+    .statusBox{background:#f9fafb;border:1px solid var(--border);border-radius:14px;padding:12px;margin-top:10px;min-height:70px}.statusLine{font-family:Consolas,Monaco,monospace;font-size:13px;margin:5px 0}
+    @media(max-width:820px){main{padding:18px}.grid{grid-template-columns:1fr}}
+  </style>
+<script>
+window.__agentSodiumReady = new Promise(function(resolve, reject) {
+  window.sodium = window.sodium || {};
+  var completed = false;
+  var previousOnload = window.sodium.onload;
+  window.sodium.onload = function(sodium) {
+    completed = true;
+    window.__agentSodium = sodium;
+    window.sodium = sodium;
+    if (typeof previousOnload === "function") {
+      try { previousOnload(sodium); } catch (e) { console.warn(e); }
+    }
+    resolve(sodium);
+  };
+  setTimeout(function() {
+    if (!completed) {
+      reject(new Error("libsodium.js konnte nicht lokal geladen werden. Prüfe assets/vendor/sodium.js über GitHub Pages."));
+    }
+  }, 20000);
+});
+</script>
+<script src="assets/vendor/sodium.js" async></script>
+</head>
+<body>
+<header><div class="brand"><div class="logo">P3</div><div><h1>Entra App Bootstrap</h1><p class="help">No-install Flow: App Registrations, Admin Consent und browserbasierter GitHub Secret Import.</p></div></div></header>
+<main>
+  <section id="consentReturn" style="display:none"></section>
+
+  <section>
+    <h2>1. Daten erfassen</h2>
+    <div class="notice"><strong>Nächster Schritt:</strong> Diese Seite wird nach dem Enduser-Bootstrap automatisch im Zielrepository geöffnet und übernimmt Tenant-/Repository-Daten aus der URL.</div>
+    <div class="grid">
+      <div class="field"><label for="owner">GitHub Owner</label><input id="owner" value="MKN1411"></div>
+      <div class="field"><label for="repo">GitHub Repository</label><input id="repo" value="Agent-Compliance"></div>
+      <div class="field"><label for="tenantId">Tenant ID</label><input id="tenantId" placeholder="33a9ca10-7495-4979-a097-cbdf74c7686f"></div>
+      <div class="field"><label for="tenantDomain">Tenant Domain</label><input id="tenantDomain" placeholder="contoso.onmicrosoft.com"></div>
+      <div class="field"><label for="branch">Branch</label><input id="branch" value="main"></div>
+      <div class="field"><label for="output">Output-Verzeichnis</label><input id="output" value=".out\entra-bootstrap"></div>
+    </div>
+    <button onclick="generate()">Invoke-Befehl erzeugen</button>
+    <button onclick="loadSample()">Beispiel laden</button>
+  </section>
+
+  <section>
+    <h2>2. Invoke-Befehl</h2>
+    <div class="notice warning"><strong>No-install:</strong> Der Befehl installiert keine PowerShell-Module und keine NuGet-Pakete. Die GitHub-Secrets werden danach im Browser aus der Datei <code>github-secrets.json</code> importiert.</div>
+    <button class="green" onclick="copy('invokeCommand')">Invoke-Befehl kopieren</button>
+    <pre id="invokeCommand">Bitte zuerst erzeugen.</pre>
+  </section>
+
+  <section>
+    <h2>3. GitHub Secrets importieren und finalen Check starten</h2>
+    <p>Nach dem PowerShell-Lauf und dem Admin Consent hier die lokal erzeugte Datei <code>.out\entra-bootstrap\github-secrets.json</code> auswählen. Der GitHub Token wird nur im Browser-Arbeitsspeicher genutzt und nicht gespeichert.</p>
+    <div class="grid">
+      <div class="field"><label for="secretFile">github-secrets.json</label><input id="secretFile" type="file" accept="application/json,.json"></div>
+      <div class="field"><label for="githubToken">GitHub Token</label><input id="githubToken" type="password" placeholder="github_pat_..." autocomplete="off"></div>
+    </div>
+    <button class="green" onclick="importSecretsAndDispatch()">Secrets setzen + Permission Check starten</button>
+    <div id="secretStatus" class="statusBox"><div class="statusLine">Bereit.</div></div>
+  </section>
+</main>
+<script>
+const ids=['owner','repo','tenantId','tenantDomain','branch','output'];
+function e(id){return document.getElementById(id)}
+function v(id){return e(id).value.trim()}
+function log(msg){const box=e('secretStatus');const line=document.createElement('div');line.className='statusLine';line.textContent='['+new Date().toLocaleTimeString()+'] '+msg;box.appendChild(line)}
+function infer(){const host=location.hostname;const parts=location.pathname.split('/').filter(Boolean);if(host.endsWith('.github.io')){e('owner').value=host.replace('.github.io','');if(parts[0])e('repo').value=parts[0]}}
+function applyParams(){const p=new URLSearchParams(location.search);const map={owner:'owner',githubOwner:'owner',targetOwner:'owner',repo:'repo',githubRepo:'repo',targetRepo:'repo',tenantId:'tenantId',tenant_id:'tenantId',tenantDomain:'tenantDomain',tenant_domain:'tenantDomain',branch:'branch',ref:'branch'};for(const [key,id] of Object.entries(map)){if(p.has(key))e(id).value=p.get(key)}}
+function handleConsentReturn(){const p=new URLSearchParams(location.search);const box=e('consentReturn');const state=p.get('state')||'App';if(p.has('admin_consent')){const ok=String(p.get('admin_consent')).toLowerCase()==='true';box.style.display='block';box.className=ok?'success notice':'danger notice';box.innerHTML=ok?'<h2>Admin Consent bestätigt: '+state+'</h2><p>Bitte die weiteren Consent-Tabs bestätigen. Danach hier <code>github-secrets.json</code> importieren und den finalen Check starten.</p>':'<h2>Admin Consent nicht bestätigt</h2><p>Bitte die Fehlermeldung prüfen und den Consent-Link erneut aus PowerShell öffnen.</p>'}if(p.has('error')){box.style.display='block';box.className='danger notice';box.innerHTML='<h2>Admin Consent Fehler</h2><p><strong>'+p.get('error')+'</strong></p><p>'+String(p.get('error_description')||'').replaceAll('+',' ')+'</p>'}}
+function loadSample(){e('tenantId').value='00000000-0000-0000-0000-000000000000';e('tenantDomain').value='contoso.onmicrosoft.com';generate()}
+function generate(){const owner=v('owner')||'MKN1411';const repo=v('repo')||'Agent-Compliance';const branch=v('branch')||'main';const full=owner+'/'+repo;const redirect='https://'+owner+'.github.io/'+repo+'/entra-bootstrap.html';const raw='https://raw.githubusercontent.com/'+owner+'/'+repo+'/'+branch+'/scripts/bootstrap/Invoke-GRCEntraAppBootstrap.ps1';const lines=[
+'$ErrorActionPreference = "Stop"',
+'$ScriptPath = Join-Path $env:TEMP "Invoke-GRCEntraAppBootstrap.ps1"',
+'Invoke-WebRequest -Uri "'+raw+'" -OutFile $ScriptPath',
+'pwsh -ExecutionPolicy Bypass -File $ScriptPath `',
+'  -TenantId "'+v('tenantId')+'" `',
+'  -TenantDomain "'+v('tenantDomain')+'" `',
+'  -GitHubRepository "'+full+'" `',
+'  -GitHubRef "'+branch+'" `',
+'  -OutputDirectory "'+(v('output')||'.out\\entra-bootstrap')+'" `',
+'  -AdminConsentRedirectUri "'+redirect+'" `',
+'  -AllowUnresolvedPermissions `',
+'  -OpenAdminConsentUrls'
+];e('invokeCommand').textContent=lines.join('\n');localStorage.setItem('agentComplianceEntraBootstrap',JSON.stringify(Object.fromEntries(ids.map(id=>[id,v(id)]))))}
+function restore(){try{const data=JSON.parse(localStorage.getItem('agentComplianceEntraBootstrap')||'{}');ids.forEach(id=>{if(data[id])e(id).value=data[id]})}catch{}}
+function copy(id){navigator.clipboard.writeText(e(id).textContent).then(()=>alert('Kopiert.'))}
+async function gh(method,url,token,body){const res=await fetch(url,{method,headers:{Accept:'application/vnd.github+json',Authorization:'Bearer '+token,'X-GitHub-Api-Version':'2022-11-28',...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});if(!res.ok&&res.status!==204){throw new Error(method+' '+url+' -> '+res.status+': '+await res.text())}if(res.status===204)return null;try{return await res.json()}catch{return null}}
+async function ensureSodium(){
+  if(window.__agentSodium && window.__agentSodium.crypto_box_seal){
+    return window.__agentSodium;
+  }
+  if(window.__agentSodiumReady){
+    const loaded = await window.__agentSodiumReady;
+    if(loaded && loaded.crypto_box_seal){
+      window.__agentSodium = loaded;
+      return loaded;
+    }
+  }
+  if(window.sodium && window.sodium.ready){
+    await window.sodium.ready;
+    window.__agentSodium = window.sodium;
+    return window.sodium;
+  }
+  if(window.sodium && window.sodium.crypto_box_seal){
+    window.__agentSodium = window.sodium;
+    return window.sodium;
+  }
+  throw new Error("libsodium.js konnte nicht lokal geladen werden. Prüfe assets/vendor/sodium.js über GitHub Pages.");
+}
+function encryptSecret(value,publicKey){
+  const s = window.__agentSodium || window.sodium;
+  if(!s || !s.crypto_box_seal){
+    throw new Error("libsodium.js ist noch nicht bereit.");
+  }
+  const binKey=s.from_base64(publicKey,s.base64_variants.ORIGINAL);
+  const binSec=s.from_string(String(value));
+  const encBytes=s.crypto_box_seal(binSec,binKey);
+  return s.to_base64(encBytes,s.base64_variants.ORIGINAL);
+}
+async function importSecretsAndDispatch(){try{e('secretStatus').innerHTML='';log('Starte Secret Import...');await ensureSodium();const file=e('secretFile').files[0];if(!file)throw new Error('Bitte github-secrets.json auswählen.');const token=v('githubToken');if(!token)throw new Error('GitHub Token fehlt.');const owner=v('owner');const repo=v('repo');const branch=v('branch')||'main';const full=owner+'/'+repo;const secrets=JSON.parse(await file.text());const pub=await gh('GET','https://api.github.com/repos/'+full+'/actions/secrets/public-key',token);for(const [name,value] of Object.entries(secrets)){const encrypted=encryptSecret(value,pub.key);await gh('PUT','https://api.github.com/repos/'+full+'/actions/secrets/'+encodeURIComponent(name),token,{encrypted_value:encrypted,key_id:pub.key_id});log('Secret gesetzt: '+name)}log('Starte finalen Permission Check...');await gh('POST','https://api.github.com/repos/'+full+'/actions/workflows/20-check-permissions.yml/dispatches',token,{ref:branch,inputs:{skip_certificate_secret_checks:'false'}});log('Fertig. GitHub Actions prüfen: https://github.com/'+full+'/actions')}catch(err){log('FEHLER: '+err.message);alert(err.message)}}
+ids.forEach(id=>e(id).addEventListener('input',generate));restore();infer();applyParams();handleConsentReturn();generate();
+</script>
+</body>
+</html>
+

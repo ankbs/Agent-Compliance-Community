@@ -1,0 +1,13 @@
+{
+  "collector": "Azure Cost Usage",
+  "status": "preview",
+  "generatedAt": "2026-06-29T14:16:46.3930504Z",
+  "note": "Fehlende Umgebungsvariablen für Azure-Verbindung. Es werden simulierte Budgetdaten angezeigt.",
+  "data": {
+    "isLive": false,
+    "subscriptions": [],
+    "budgets": [],
+    "costs": [],
+    "error": null
+  }
+}

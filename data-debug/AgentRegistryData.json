@@ -1,0 +1,136 @@
+{
+  "collector": "Agent 365 Registry Data",
+  "status": "live",
+  "generatedAt": "2026-06-29T14:16:39.0472324Z",
+  "tenantId": "33a9ca10-7495-4979-a097-cbdf74c7686f",
+  "tenantDomain": "mycloudofficedev.onmicrosoft.com",
+  "note": "Live Microsoft Graph tenant data collected with the Reader app.",
+  "data": {
+    "source": "Microsoft Graph",
+    "tenant": {
+      "organizationDisplayName": "mycloudofficedev",
+      "organizationId": "33a9ca10-7495-4979-a097-cbdf74c7686f",
+      "verifiedDomains": [
+        {
+          "id": "mycloudofficedev.onmicrosoft.com",
+          "isDefault": true,
+          "isInitial": true,
+          "isVerified": true
+        },
+        {
+          "id": "mycloudofficedev.mail.onmicrosoft.com",
+          "isDefault": false,
+          "isInitial": false,
+          "isVerified": true
+        }
+      ],
+      "usersVisible": 26,
+      "usersEnabledVisible": 26,
+      "applicationsVisible": 38,
+      "servicePrincipalsVisible": 100,
+      "subscribedSkus": [
+        {
+          "skuPartNumber": "MDATP_XPLAT",
+          "capabilityStatus": "Enabled",
+          "consumedUnits": 1,
+          "enabledUnits": 1,
+          "suspendedUnits": 0,
+          "warningUnits": 0
+        },
+        {
+          "skuPartNumber": "FLOW_FREE",
+          "capabilityStatus": "Enabled",
+          "consumedUnits": 1,
+          "enabledUnits": 10000,
+          "suspendedUnits": 0,
+          "warningUnits": 0
+        },
+        {
+          "skuPartNumber": "CCIBOTS_PRIVPREV_VIRAL",
+          "capabilityStatus": "Enabled",
+          "consumedUnits": 1,
+          "enabledUnits": 10000,
+          "suspendedUnits": 0,
+          "warningUnits": 0
+        },
+        {
+          "skuPartNumber": "DEVELOPERPACK_E5",
+          "capabilityStatus": "Enabled",
+          "consumedUnits": 19,
+          "enabledUnits": 25,
+          "suspendedUnits": 0,
+          "warningUnits": 0
+        },
+        {
+          "skuPartNumber": "SharePoint_advanced_management_plan_1",
+          "capabilityStatus": "Suspended",
+          "consumedUnits": 1,
+          "enabledUnits": 0,
+          "suspendedUnits": 25,
+          "warningUnits": 0
+        },
+        {
+          "skuPartNumber": "O365_BUSINESS_ESSENTIALS",
+          "capabilityStatus": "Suspended",
+          "consumedUnits": 0,
+          "enabledUnits": 0,
+          "suspendedUnits": 25,
+          "warningUnits": 0
+        },
+        {
+          "skuPartNumber": "Microsoft_Entra_Suite",
+          "capabilityStatus": "Suspended",
+          "consumedUnits": 1,
+          "enabledUnits": 0,
+          "suspendedUnits": 25,
+          "warningUnits": 0
+        }
+      ],
+      "agentLicenseStatus": "fallback_alternative",
+      "licensingNote": "Der Abruf der Premium-Katalogdaten konnte wegen fehlender Microsoft Agent 365 Lizenz nicht durchgeführt werden. Es werden Daten über alternative APIs / Service-Principals gezeigt.",
+      "copilotActiveCount": 24
+    },
+    "agentCandidates": [
+      {
+        "name": "Power Platform Data Analytics",
+        "owner": "Tenant",
+        "status": "Active",
+        "risk": "Low",
+        "credits": 0,
+        "source": "Microsoft Graph servicePrincipals",
+        "appId": "7dcff627-a295-4553-9229-b1f3513f82a8"
+      },
+      {
+        "name": "PROD-OpalAgenticApp",
+        "owner": "Tenant",
+        "status": "Active",
+        "risk": "Low",
+        "credits": 0,
+        "source": "Microsoft Graph servicePrincipals",
+        "appId": "2e9aeb53-f3fc-46d7-8ea6-fde52de14113"
+      },
+      {
+        "name": "SecOps for Security Copilot",
+        "owner": "Tenant",
+        "status": "Active",
+        "risk": "Low",
+        "credits": 0,
+        "source": "Microsoft Graph servicePrincipals",
+        "appId": "3e28acb6-7793-4fff-9fcf-fb14fbaf42a9"
+      },
+      {
+        "name": "ASC-Bereitstellungs-Gastkonfigurations-Agent für Linux",
+        "owner": "Tenant",
+        "status": "Active",
+        "risk": "Low",
+        "credits": 0,
+        "source": "Microsoft Graph servicePrincipals",
+        "appId": "289294d5-6a7a-4c0f-983a-504db96de9e2"
+      }
+    ],
+    "limitations": [
+      "Microsoft 365 Copilot agent-specific usage, Copilot Studio consumption and Azure token cost APIs are not yet fully wired in this MOC.",
+      "Visible counts are based on Microsoft Graph objects returned to the Reader app and may be limited by assigned permissions and API paging."
+    ]
+  }
+}

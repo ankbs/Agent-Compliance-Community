@@ -1,0 +1,24 @@
+{
+  "appProfile": "Reader",
+  "description": "Read-only permissions for Copilot, Agent, AI usage, billing transparency and governance reporting.",
+  "includesExchangeOnline": false,
+  "includesMailboxAccess": false,
+  "includesDestructiveActions": false,
+  "permissions": [
+    { "resource": "Microsoft Graph", "permission": "Reports.Read.All", "type": "Application", "reason": "Read Microsoft 365 usage and Copilot adoption reports where available." },
+    { "resource": "Microsoft Graph", "permission": "Directory.Read.All", "type": "Application", "reason": "Read tenant, users, groups and ownership context for governance mapping." },
+    { "resource": "Microsoft Graph", "permission": "Application.Read.All", "type": "Application", "reason": "Read application and service principal inventory for agent and app governance context." },
+    { "resource": "Microsoft Graph", "permission": "AuditLog.Read.All", "type": "Application", "reason": "Read audit and sign-in context for governance checks where supported." },
+    { "resource": "Microsoft Graph", "permission": "Policy.Read.All", "type": "Application", "reason": "Read tenant policy context relevant to AI and access governance." },
+    { "resource": "Microsoft Graph", "permission": "AgentRegistration.Read.All", "type": "Application", "reason": "Read registered Microsoft 365 agents for inventory and governance reporting." },
+    { "resource": "Microsoft Graph", "permission": "CopilotPackages.Read.All", "type": "Application", "reason": "Read Copilot package metadata in application contexts." },
+    { "resource": "Microsoft Graph", "permission": "AppCatalog.Read.All", "type": "Application", "reason": "Read Teams app catalog metadata to query available third-party apps." },
+    { "resource": "Microsoft Graph", "permission": "AgentRegistration.Read.All", "type": "Delegated", "reason": "Allow signed-in read sessions to inspect registered agents where delegated APIs are required." },
+    { "resource": "Microsoft Graph", "permission": "CopilotPackages.Read.All", "type": "Delegated", "reason": "Read Copilot package metadata in delegated contexts where app-only access is not available." },
+    { "resource": "Microsoft Graph", "permission": "AppCatalog.Read.All", "type": "Delegated", "reason": "Read Teams app catalog in delegated sessions." }
+  ],
+  "notes": [
+    "Reader is read-only and must not contain write, budget, billing or destructive permissions.",
+    "Delegated permissions are consent metadata for signed-in flows; certificate-based app-only automation uses application permissions."
+  ]
+}

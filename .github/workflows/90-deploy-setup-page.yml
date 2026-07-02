@@ -1,0 +1,59 @@
+name: 90 - Deploy Setup Page
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare static site
+        shell: bash
+        run: |
+          rm -rf _site
+          mkdir -p _site
+          cp -R setup/* _site/
+
+          mkdir -p _site/dashboard _site/reports
+          cat > _site/dashboard/index.html <<'HTML'
+          <!doctype html>
+          <html lang="de">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Agent Compliance Dashboard</title>
+          </head>
+          <body>
+            <h1>Agent Compliance Dashboard</h1>
+            <p>Noch kein veröffentlichter Report vorhanden.</p>
+            <p>Bitte Workflow <strong>40 - Build Report</strong> ausführen. Danach wird diese Seite mit dem generierten Dashboard ersetzt.</p>
+          </body>
+          </html>
+          HTML
+
+          cp _site/dashboard/index.html _site/reports/index.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+      - name: Deploy setup page to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

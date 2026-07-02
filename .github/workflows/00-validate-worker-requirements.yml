@@ -1,0 +1,41 @@
+name: 00 - Validate Worker Requirements
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_module_install:
+        description: Skip module installation on the GitHub runner
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+
+jobs:
+  validate:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate runner requirements
+        shell: pwsh
+        run: |
+          $params = @{}
+          if ('${{ inputs.skip_module_install }}' -eq 'true') {
+            $params.SkipModuleInstall = $true
+          }
+          ./scripts/requirements/Test-WorkerRequirements.ps1 @params
+
+      - name: Upload worker requirement report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: worker-requirements
+          path: |
+            data/processed/requirements/worker-requirements.json
+            data/reports/00-worker-requirements.md

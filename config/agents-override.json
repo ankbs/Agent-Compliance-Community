@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Test Agent 01",
+    "owner": "Michael Kirst-Neshva",
+    "source": "Copilot Studio",
+    "status": "Aktiv",
+    "risk": "Niedrig",
+    "action": "Review"
+  },
+  {
+    "name": "NIST 800-171 Assister",
+    "owner": "Michael Kirst-Neshva",
+    "source": "M365 Copilot-Agent Builder",
+    "status": "Aktiv",
+    "risk": "Niedrig",
+    "action": "Review"
+  },
+  {
+    "name": "Label Audit Dokumen",
+    "owner": "Michael Kirst-Neshva",
+    "source": "Copilot Studio",
+    "status": "Aktiv",
+    "risk": "Niedrig",
+    "action": "Review"
+  }
+]

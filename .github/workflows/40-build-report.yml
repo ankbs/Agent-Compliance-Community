@@ -1,0 +1,121 @@
+name: 40 - Build Report
+
+on:
+  workflow_run:
+    workflows:
+      - 30 - Run Collectors
+    types:
+      - completed
+  workflow_dispatch:
+
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  report:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: windows-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download collector artifact
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $eventName = '${{ github.event_name }}'
+          $branch = '${{ github.ref_name }}'
+          $workflowFile = '30-run-collectors.yml'
+          if ($eventName -eq 'workflow_run') {
+            $collectorConclusion = '${{ github.event.workflow_run.conclusion }}'
+            if ($collectorConclusion -ne 'success') { throw "Collector workflow did not finish successfully. Conclusion: $collectorConclusion" }
+            $runId = '${{ github.event.workflow_run.id }}'
+            Write-Host "Using triggering collector workflow_run id: $runId"
+          } else {
+            Write-Host "Manual report build: locating latest successful collector run on branch '$branch'."
+            $runsJson = gh run list --workflow $workflowFile --branch $branch --status success --limit 10 --json databaseId,createdAt,headSha,conclusion,event
+            $runs = @($runsJson | ConvertFrom-Json)
+            if ($runs.Count -eq 0) { throw "No successful '30 - Run Collectors' run found on branch '$branch'. Run workflow 30 first." }
+            $runId = ($runs | Select-Object -First 1).databaseId
+          }
+          if (Test-Path '.collector-artifacts') { Remove-Item '.collector-artifacts' -Recurse -Force }
+          New-Item -ItemType Directory -Path '.collector-artifacts' -Force | Out-Null
+          New-Item -ItemType Directory -Path 'data/raw' -Force | Out-Null
+          gh run download $runId --name raw-agent-compliance-data --dir '.collector-artifacts'
+          if ($LASTEXITCODE -ne 0) { throw "Downloading artifact raw-agent-compliance-data from collector run $runId failed." }
+          $jsonFiles = @(Get-ChildItem '.collector-artifacts' -Recurse -Filter '*.json' -File)
+          if ($jsonFiles.Count -eq 0) { throw 'Downloaded collector artifact contains no JSON files.' }
+          foreach ($file in $jsonFiles) { Copy-Item -Path $file.FullName -Destination (Join-Path 'data/raw' $file.Name) -Force }
+          [pscustomobject]@{ sourceWorkflow=$workflowFile; sourceRunId=$runId; downloadedAt=(Get-Date).ToUniversalTime().ToString('o'); files=@($jsonFiles|Select Name,Length) } | ConvertTo-Json -Depth 20 | Set-Content 'data/raw/_collector-artifact-source.json' -Encoding UTF8
+          Get-ChildItem 'data/raw' -Filter '*.json' | Select Name,Length | Format-Table -AutoSize
+      - name: Build governance model and report
+        shell: pwsh
+        env:
+          CAG_READER_CLIENT_ID: ${{ secrets.CAG_READER_CLIENT_ID }}
+          TENANT_ID: ${{ vars.TENANT_ID }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          ./scripts/reporting/Convert-RawDataToGovernanceModel.ps1
+          ./scripts/reporting/New-ActionRecommendation.ps1
+          ./scripts/reporting/Export-CommunityReport.ps1
+          Get-ChildItem 'data/reports' -Recurse | Select FullName, Length | Format-Table -AutoSize
+          if (-not (Test-Path 'data/reports/dashboard/index.html')) { throw 'Missing generated dashboard file: data/reports/dashboard/index.html' }
+          if (-not (Test-Path 'data/reports/reports/index.html')) { throw 'Missing generated reports file: data/reports/reports/index.html' }
+      - name: Prepare GitHub Pages site
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $site = '_site'
+          if (Test-Path $site) { Remove-Item $site -Recurse -Force }
+          New-Item -ItemType Directory -Path $site -Force | Out-Null
+          if (Test-Path 'setup') { Copy-Item -Path 'setup/*' -Destination $site -Recurse -Force }
+          Copy-Item -Path 'data/reports/*' -Destination $site -Recurse -Force
+          if (-not (Test-Path "$site/dashboard/index.html")) { throw 'Pages artifact does not contain dashboard/index.html.' }
+          if (-not (Test-Path "$site/reports/index.html")) { throw 'Pages artifact does not contain reports/index.html.' }
+          '<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="refresh" content="0; url=dashboard/"><title>Agent Compliance</title></head><body><a href="dashboard/">Dashboard öffnen</a></body></html>' | Set-Content -Path "$site/index.html" -Encoding UTF8
+          '' | Set-Content -Path "$site/.nojekyll" -Encoding UTF8
+          Get-ChildItem $site -Recurse | Select FullName, Length | Format-Table -AutoSize
+      - name: Render PDF reports
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          $browser = $null
+          foreach ($candidate in @('C:\Program Files\Google\Chrome\Application\chrome.exe','C:\Program Files (x86)\Google\Chrome\Application\chrome.exe','C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe','C:\Program Files\Microsoft\Edge\Application\msedge.exe')) { if (Test-Path $candidate) { $browser = $candidate; break } }
+          if (-not $browser) { Write-Warning 'No browser found for headless PDF rendering.'; return }
+          New-Item -ItemType Directory -Path '_site/reports/pdf' -Force | Out-Null
+          New-Item -ItemType Directory -Path 'data/reports/pdf' -Force | Out-Null
+          $reportFile = (Resolve-Path '_site/reports/index.html').Path
+          $managementPdf = (Resolve-Path '_site/reports/pdf').Path + '\management-summary.pdf'
+          $detailPdf = (Resolve-Path '_site/reports/pdf').Path + '\detail-report.pdf'
+          & $browser --headless --disable-gpu --no-sandbox --print-to-pdf="$managementPdf" "file:///$($reportFile.Replace('\','/'))"
+          & $browser --headless --disable-gpu --no-sandbox --print-to-pdf="$detailPdf" "file:///$($reportFile.Replace('\','/'))"
+          Copy-Item '_site/reports/pdf/*.pdf' 'data/reports/pdf/' -Force
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: community-report
+          path: |
+            data/raw/*.json
+            data/processed/*.json
+            data/reports/**/*.html
+            data/reports/**/*.pdf
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+      - name: Deploy dashboard to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

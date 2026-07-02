@@ -1,0 +1,85 @@
+name: 10 - Bootstrap Plan
+
+on:
+  workflow_dispatch:
+    inputs:
+      tenant_id:
+        description: Microsoft Entra tenant ID
+        required: true
+        type: string
+      tenant_domain:
+        description: Primary tenant domain, for example contoso.onmicrosoft.com
+        required: true
+        type: string
+      reader_upn:
+        description: Authorized reader UPN
+        required: true
+        type: string
+      status_admin_upn:
+        description: Authorized status admin UPN
+        required: true
+        type: string
+      change_admin_upn:
+        description: Authorized change admin UPN
+        required: true
+        type: string
+      notification_mail:
+        description: Notification mailbox or distribution list
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+
+jobs:
+  plan:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create bootstrap plan artifact
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Path ./data/processed/setup -Force | Out-Null
+          New-Item -ItemType Directory -Path ./data/reports -Force | Out-Null
+
+          $plan = [pscustomobject]@{
+            tenantId = '${{ inputs.tenant_id }}'
+            tenantDomain = '${{ inputs.tenant_domain }}'
+            authorizedReaderUpn = '${{ inputs.reader_upn }}'
+            authorizedStatusAdminUpn = '${{ inputs.status_admin_upn }}'
+            authorizedChangeAdminUpn = '${{ inputs.change_admin_upn }}'
+            notificationMail = '${{ inputs.notification_mail }}'
+            appProfiles = @('Reader','AgentStatusAction','BillingChange')
+            exchangeOnlineIncluded = $false
+            createdAtUtc = (Get-Date).ToUniversalTime().ToString('o')
+          }
+
+          $plan | ConvertTo-Json -Depth 20 | Set-Content ./data/processed/setup/bootstrap-plan.json -Encoding UTF8
+
+          @(
+            '# 10 - Bootstrap Plan',
+            '',
+            'This workflow creates the setup plan for the three mandatory app profiles.',
+            '',
+            '- Reader App',
+            '- Agent Status Action App',
+            '- Billing Change App',
+            '',
+            'Exchange Online workload permissions are not part of this MOC.',
+            '',
+            'The next step is to run the Cloud Shell bootstrap script documented in docs/community-setup.md.'
+          ) | Set-Content ./data/reports/10-bootstrap-plan.md -Encoding UTF8
+
+      - name: Upload bootstrap plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: bootstrap-plan
+          path: |
+            data/processed/setup/bootstrap-plan.json
+            data/reports/10-bootstrap-plan.md

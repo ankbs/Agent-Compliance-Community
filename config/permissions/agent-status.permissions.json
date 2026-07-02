@@ -1,0 +1,33 @@
+{
+  "appProfile": "AgentStatusAction",
+  "description": "Permissions for agent status actions only. No budget or billing changes.",
+  "includesExchangeOnline": false,
+  "includesMailboxAccess": false,
+  "includesBudgetChange": false,
+  "permissions": [
+    { "resource": "Microsoft Graph", "permission": "Reports.Read.All", "type": "Application", "reason": "Read usage and governance reports needed before status actions." },
+    { "resource": "Microsoft Graph", "permission": "Directory.Read.All", "type": "Application", "reason": "Resolve owners and authorized admin users for status workflows." },
+    { "resource": "Microsoft Graph", "permission": "Application.Read.All", "type": "Application", "reason": "Read app and service principal context for agent ownership and governance." },
+    { "resource": "Microsoft Graph", "permission": "AgentRegistration.Read.All", "type": "Application", "reason": "Read registered agents before status changes." },
+    { "resource": "Microsoft Graph", "permission": "AgentRegistration.ReadWrite.All", "type": "Application", "reason": "Perform approved status actions such as stop, block, disable or mark for review where supported." },
+    { "resource": "Microsoft Graph", "permission": "CopilotPackages.Read.All", "type": "Application", "reason": "Read Copilot package metadata in application contexts." },
+    { "resource": "Microsoft Graph", "permission": "AppCatalog.ReadWrite.All", "type": "Application", "reason": "Modify app catalog entries (block/install) in application contexts." },
+    { "resource": "Microsoft Graph", "permission": "CopilotPackages.ReadWrite.All", "type": "Application", "reason": "Apply approved governance changes to Copilot package metadata where supported." },
+    { "resource": "Microsoft Graph", "permission": "CopilotSettings-LimitedMode.Read", "type": "Delegated", "reason": "Read Limited Mode settings during signed-in review flows." },
+    { "resource": "Microsoft Graph", "permission": "CopilotSettings-LimitedMode.ReadWrite", "type": "Delegated", "reason": "Change Limited Mode settings only after explicit approval." },
+    { "resource": "Microsoft Graph", "permission": "CopilotPolicySettings.Read", "type": "Delegated", "reason": "Read Copilot policy settings for review and approval." },
+    { "resource": "Microsoft Graph", "permission": "CopilotPolicySettings.ReadWrite", "type": "Delegated", "reason": "Change Copilot policy settings only after explicit approval." },
+    { "resource": "Microsoft Graph", "permission": "Reports.Read.All", "type": "Delegated", "reason": "Read reports in signed-in status review flows." },
+    { "resource": "Microsoft Graph", "permission": "AgentRegistration.Read.All", "type": "Delegated", "reason": "Read registered agents in signed-in status review flows." },
+    { "resource": "Microsoft Graph", "permission": "AgentRegistration.ReadWrite.All", "type": "Delegated", "reason": "Perform approved delegated agent status actions where required by API." },
+    { "resource": "Microsoft Graph", "permission": "CopilotPackages.Read.All", "type": "Delegated", "reason": "Read Copilot package metadata in signed-in review flows." },
+    { "resource": "Microsoft Graph", "permission": "CopilotPackages.ReadWrite.All", "type": "Delegated", "reason": "Change Copilot package metadata only after explicit approval." },
+    { "resource": "Microsoft Graph", "permission": "AppCatalog.ReadWrite.All", "type": "Delegated", "reason": "Modify app catalog entries (block/install) in delegated sessions." },
+    { "resource": "WorkIQ", "permission": "WorkIQAgent.Ask", "type": "Delegated", "reason": "Enable approved signed-in WorkIQ agent query flows. The WorkIQ service principal is only a prerequisite resource, not a separate app profile." }
+  ],
+  "requiresManualApproval": true,
+  "notes": [
+    "AgentStatusAction is isolated from billing and budget changes.",
+    "WorkIQ is tracked as a prerequisite service principal only."
+  ]
+}

@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agent Compliance Enduser Bootstrap</title>
+  <style>
+    :root{--bg:#f6f7fb;--panel:#fff;--text:#182033;--muted:#667085;--border:#d9dee8;--primary:#34388a;--primary2:#eef0ff;--red:#d71920;--green:#027a48;--warn:#b54708;--code:#101828}
+    *{box-sizing:border-box}body{margin:0;font-family:"Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#fff 0%,var(--bg) 240px);color:var(--text)}
+    header{background:#fff;border-bottom:4px solid var(--red);padding:28px 36px}.brand{display:flex;gap:16px;align-items:center}.logo{width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#242b80,#5e65c7);color:#fff;font-weight:800;display:grid;place-items:center;font-size:23px}h1{margin:0;font-size:30px}.subtitle{margin:7px 0 0;color:var(--muted);max-width:1120px;line-height:1.45}
+    main{display:grid;grid-template-columns:330px 1fr;gap:20px;padding:24px 36px 50px}nav{position:sticky;top:20px;align-self:start;background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(16,24,40,.06)}nav a{display:block;text-decoration:none;color:var(--text);font-weight:700;border-radius:10px;padding:10px 12px;margin:4px 0}nav a:hover{background:var(--primary2);color:var(--primary)}
+    section{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:18px;box-shadow:0 10px 30px rgba(16,24,40,.05)}h2{margin:0 0 12px;font-size:22px}h3{margin:20px 0 8px;font-size:17px}p,li{line-height:1.55}.grid{display:grid;grid-template-columns:repeat(2,minmax(240px,1fr));gap:14px}.field{margin-bottom:14px}label{display:block;font-weight:800;margin-bottom:6px}.help{color:var(--muted);font-size:13px;margin-top:4px}input,select,textarea{width:100%;border:1px solid var(--border);border-radius:10px;padding:11px 12px;font:inherit;background:#fff}textarea{min-height:110px;font-family:Consolas,Monaco,monospace}
+    button{border:none;background:var(--primary);color:#fff;border-radius:10px;padding:11px 16px;font-weight:800;cursor:pointer;margin:4px 6px 4px 0}.secondary{background:#344054}.green{background:var(--green)}.red{background:var(--red)}button:disabled{opacity:.55;cursor:not-allowed}
+    .notice{border-left:5px solid var(--primary);background:var(--primary2);padding:12px 14px;border-radius:10px;margin:12px 0}.warning{border-left-color:var(--warn);background:#fffaeb}.danger{border-left-color:#b42318;background:#fef3f2}.success{border-left-color:var(--green);background:#ecfdf3}
+    pre{background:var(--code);color:#f2f4f7;border-radius:14px;padding:16px;overflow:auto;white-space:pre-wrap;line-height:1.45}code{background:#f2f4f7;padding:2px 5px;border-radius:5px}.statusBox{background:#f9fafb;border:1px solid var(--border);border-radius:14px;padding:12px;margin-top:10px;min-height:80px}.statusLine{font-family:Consolas,Monaco,monospace;font-size:13px;margin:5px 0}.copyRow{display:flex;justify-content:space-between;gap:10px;align-items:center}
+    table{width:100%;border-collapse:collapse;margin:12px 0}td,th{border-bottom:1px solid var(--border);padding:10px;text-align:left;vertical-align:top}th{background:#f9fafb}.small{font-size:13px;color:var(--muted)}
+    @media(max-width:980px){main{grid-template-columns:1fr;padding:18px}nav{position:relative;top:0}.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo">P3</div><div><h1>Agent Compliance Enduser Bootstrap</h1><p class="subtitle">Öffentliche Bootstrap-Seite für Enduser-Repositories. Die Seite erstellt eine Kopie aus dem Community-Template, stellt bei Bedarf Public-Visibility für GitHub Pages her, setzt Variables und startet die ersten Workflows.</p></div></div>
+</header>
+<main>
+  <nav>
+    <a href="#why">0. Warum dieser Einstieg?</a>
+    <a href="#target">1. Enduser-Repository</a>
+    <a href="#tenant">2. Tenant-/UPN-Daten</a>
+    <a href="#token">3. GitHub Token</a>
+    <a href="#run">4. Automatisch ausführen</a>
+    <a href="#generated">5. Fallback-Befehle</a>
+    <a href="#limits">6. Grenzen</a>
+  </nav>
+  <div>
+    <section id="why">
+      <h2>0. Warum dieser Einstieg?</h2>
+      <p>Der Enduser benötigt keinen Zugriff auf ein privates Entwicklungsrepository. Die eigene Arbeitskopie wird aus einem öffentlichen, bereinigten Community-Template erzeugt und anschließend im GitHub-Account des Endusers konfiguriert.</p>
+      <div class="notice warning"><strong>Wichtig:</strong> GitHub Pages funktioniert bei kostenlosen GitHub-Konten nur für öffentliche Repositories. Wenn das Zielrepository private ist, stellt die Seite es vor der Pages-Aktivierung automatisch auf public um.</div>
+      <div class="notice danger"><strong>MOC-Grenze:</strong> Keine Exchange-Online-Berechtigungen, kein <code>Exchange.ManageAsApp</code>, keine Mailbox-Zugriffe und keine Exchange Online PowerShell.</div>
+      <table><thead><tr><th>Baustein</th><th>Rolle</th></tr></thead><tbody>
+        <tr><td>Öffentliches Community-Template</td><td>Bereinigte Enduser-Kopie mit Setup, Workflows, Manifests und Dashboard.</td></tr>
+        <tr><td>Diese Bootstrap-Seite</td><td>Erstellt Enduser-Repo, setzt Variables, aktiviert Pages und startet Workflows.</td></tr>
+        <tr><td>Enduser-Repo</td><td>Ausführungsort der GitHub Actions Worker und späteres Dashboard.</td></tr>
+      </tbody></table>
+    </section>
+
+    <section id="target">
+      <h2>1. Enduser-Repository erstellen</h2>
+      <div class="grid">
+        <div class="field"><label for="templateOwner">Template Owner</label><input id="templateOwner" value="MKN1411"><div class="help">Öffentlicher GitHub Owner des Community-Templates.</div></div>
+        <div class="field"><label for="templateRepo">Template Repository</label><input id="templateRepo" value="Agent-Compliance-Community-Template"><div class="help">Muss als GitHub Template Repository verfügbar sein.</div></div>
+        <div class="field"><label for="targetOwner">Enduser GitHub Owner</label><input id="targetOwner" placeholder="github-user-or-org"><div class="help">Account oder Organisation, in der die Kopie erstellt wird, z. B. ankbs.</div></div>
+        <div class="field"><label for="targetRepo">Enduser Repository</label><input id="targetRepo" value="Agent-Compliance-Community"></div>
+        <div class="field"><label for="repoVisibility">Repository Sichtbarkeit</label><select id="repoVisibility"><option value="public" selected>Public Enduser-Kopie</option><option value="private">Private Enduser-Kopie, wird für Free Pages auf public umgestellt</option></select></div>
+        <div class="field"><label for="branchRef">Branch / Ref</label><input id="branchRef" value="main"></div>
+      </div>
+      <button onclick="generate()">Konfiguration erzeugen</button>
+      <button class="secondary" onclick="loadSample()">Beispieldaten laden</button>
+      <button class="secondary" onclick="copyDeepLink()">Setup-Link kopieren</button>
+      <div class="help">URL-Parameter werden unterstützt: <code>?targetOwner=...&targetRepo=...&tenantId=...</code></div>
+    </section>
+
+    <section id="tenant">
+      <h2>2. Tenant- und UPN-Daten ausfüllen</h2>
+      <div class="grid">
+        <div class="field"><label for="tenantId">Tenant ID</label><input id="tenantId" placeholder="00000000-0000-0000-0000-000000000000"></div>
+        <div class="field"><label for="tenantDomain">Tenant Domain</label><input id="tenantDomain" placeholder="contoso.onmicrosoft.com"></div>
+        <div class="field"><label for="readerUpn">Reader UPN</label><input id="readerUpn" placeholder="reader@contoso.com"></div>
+        <div class="field"><label for="statusAdminUpn">Status Admin UPN</label><input id="statusAdminUpn" placeholder="ai-status-admin@contoso.com"></div>
+        <div class="field"><label for="changeAdminUpn">Change Admin UPN</label><input id="changeAdminUpn" placeholder="billing-change-admin@contoso.com"></div>
+        <div class="field"><label for="notificationMail">Notification Mail</label><input id="notificationMail" placeholder="m365-governance@contoso.com"></div>
+        <div class="field"><label for="mode">Testmodus</label><select id="mode"><option value="initial">Initialtest ohne App-Secrets</option><option value="full">Volltest mit App-Secrets</option></select></div>
+      </div>
+    </section>
+
+    <section id="token">
+      <h2>3. GitHub Token</h2>
+      <p>Für den vollautomatischen Browser-Flow wird ein kurzlebiger GitHub Token benötigt. Der Token wird nicht gespeichert, nicht in die URL geschrieben und nicht ins Repository committet.</p>
+      <div class="notice warning"><strong>Empfehlung:</strong> Token direkt nach dem Test widerrufen. Der Token muss zum Target Owner passen, z. B. <code>ankbs</code>.</div>
+      <div class="grid">
+        <div class="field"><label for="githubToken">GitHub PAT / Token</label><input id="githubToken" type="password" placeholder="github_pat_..." autocomplete="off"></div>
+        <div class="field"><label for="createRepoMode">Repository-Erstellung</label><select id="createRepoMode"><option value="template">Kopie aus Template erzeugen</option><option value="existing">Repository existiert bereits</option></select></div>
+      </div>
+      <h3>Benötigte GitHub-Rechte</h3>
+      <ul>
+        <li>Administration: read/write.</li>
+        <li>Contents: read/write.</li>
+        <li>Workflows: read/write.</li>
+        <li>Actions: read/write.</li>
+        <li>Variables: read/write.</li>
+        <li>Pages: read/write.</li>
+      </ul>
+    </section>
+
+    <section id="run">
+      <h2>4. Automatisch ausführen</h2>
+      <button class="green" onclick="runFullBootstrap()">Enduser-Repo erstellen + konfigurieren + Workflows starten</button>
+      <button onclick="createRepoFromTemplate()">Nur Repo-Kopie erstellen</button>
+      <button onclick="setRepositoryVariables()">Nur Variables setzen</button>
+      <button onclick="dispatchInitialWorkflows()">Nur Initial-Workflows starten</button>
+      <div id="status" class="statusBox"><div class="statusLine">Bereit.</div></div>
+    </section>
+
+    <section id="generated">
+      <h2>5. Fallback-Befehle</h2>
+      <h3>GitHub CLI: Template-Kopie</h3>
+      <div class="copyRow"><p class="help">Manueller Fallback, falls die Browser-Automatisierung nicht genutzt werden soll.</p><button onclick="copy('templateCommands')">Kopieren</button></div>
+      <pre id="templateCommands">Bitte zuerst Konfiguration erzeugen.</pre>
+      <h3>GitHub CLI: Variables</h3>
+      <div class="copyRow"><p class="help">Tenant-/UPN-Konfiguration für das Zielrepository.</p><button onclick="copy('variableCommands')">Kopieren</button></div>
+      <pre id="variableCommands">Bitte zuerst Konfiguration erzeugen.</pre>
+      <h3>Workflow Inputs</h3>
+      <div class="copyRow"><p class="help">Inputs für Bootstrap Plan.</p><button onclick="copy('workflowInputs')">Kopieren</button></div>
+      <pre id="workflowInputs">Bitte zuerst Konfiguration erzeugen.</pre>
+      <h3>GitHub Actions Links</h3>
+      <pre id="actionLinks">Bitte zuerst Konfiguration erzeugen.</pre>
+    </section>
+
+    <section id="limits">
+      <h2>6. Grenzen und nächster Ausbau</h2>
+      <p>Microsoft Entra App Registrations brauchen weiterhin einen initialen Microsoft-Trust-Schritt. Dieser wird im nächsten Ausbau über Azure Cloud Shell vorbereitet.</p>
+      <ul>
+        <li>Für externe Enduser ist ein öffentliches, bereinigtes Community-Template erforderlich.</li>
+        <li>Secrets für Zertifikate werden erst nach App-Erstellung gesetzt.</li>
+        <li>Initiale Checks können mit <code>skip_certificate_secret_checks=true</code> laufen.</li>
+      </ul>
+    </section>
+  </div>
+</main>
+<script>
+const ids=['templateOwner','templateRepo','targetOwner','targetRepo','repoVisibility','tenantId','tenantDomain','readerUpn','statusAdminUpn','changeAdminUpn','notificationMail','mode','branchRef','createRepoMode'];
+function el(id){return document.getElementById(id)}
+function v(id){const e=el(id);return e?e.value.trim():''}
+function b(id){return document.getElementById(id)}
+function log(msg){const box=b('status');const line=document.createElement('div');line.className='statusLine';line.textContent='['+new Date().toLocaleTimeString()+'] '+msg;box.appendChild(line)}
+function resetLog(){b('status').innerHTML=''}
+function esc(s){return String(s||'').replace(/`/g,'``').replace(/"/g,'\\"')}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+function model(){const targetOwner=v('targetOwner')||v('templateOwner');const targetRepo=v('targetRepo')||'Agent-Compliance-Community';return {templateOwner:v('templateOwner'),templateRepo:v('templateRepo'),targetOwner,targetRepo,full:targetOwner+'/'+targetRepo,isPrivate:v('repoVisibility')==='private',tenantId:v('tenantId'),tenantDomain:v('tenantDomain'),reader:v('readerUpn'),status:v('statusAdminUpn'),change:v('changeAdminUpn'),mail:v('notificationMail'),mode:v('mode'),skipSecrets:v('mode')==='initial'?'true':'false',ref:v('branchRef')||'main',createMode:v('createRepoMode')}}
+function applyParams(){const p=new URLSearchParams(location.search);const map={templateOwner:'templateOwner',templateRepo:'templateRepo',targetOwner:'targetOwner',owner:'targetOwner',targetRepo:'targetRepo',repo:'targetRepo',tenantId:'tenantId',tenantDomain:'tenantDomain',readerUpn:'readerUpn',statusAdminUpn:'statusAdminUpn',changeAdminUpn:'changeAdminUpn',notificationMail:'notificationMail',mode:'mode',ref:'branchRef'};for(const [k,id] of Object.entries(map)){if(p.has(k))el(id).value=p.get(k)}}
+function persist(){const d={};ids.forEach(id=>d[id]=v(id));localStorage.setItem('agentComplianceEnduserBootstrap',JSON.stringify(d))}
+function restore(){try{const raw=localStorage.getItem('agentComplianceEnduserBootstrap');if(!raw)return;const d=JSON.parse(raw);ids.forEach(id=>{if(d[id])el(id).value=d[id]})}catch{}}
+function loadSample(){el('targetOwner').value='ankbs';el('targetRepo').value='Agent-Compliance-Community';el('repoVisibility').value='public';el('tenantId').value='00000000-0000-0000-0000-000000000000';el('tenantDomain').value='contoso.onmicrosoft.com';el('readerUpn').value='reader@contoso.com';el('statusAdminUpn').value='ai-status-admin@contoso.com';el('changeAdminUpn').value='billing-change-admin@contoso.com';el('notificationMail').value='m365-governance@contoso.com';generate()}
+function getVars(m){return {TENANT_ID:m.tenantId,TENANT_DOMAIN:m.tenantDomain,AUTHORIZED_READER_UPN:m.reader,AUTHORIZED_STATUS_ADMIN_UPN:m.status,AUTHORIZED_CHANGE_ADMIN_UPN:m.change,NOTIFICATION_MAIL:m.mail,FEATURE_EXCHANGE_ONLINE:'false',FEATURE_COPILOT_USAGE_READ:'true',FEATURE_AGENT365_REGISTRY_READ:'true',FEATURE_COPILOT_STUDIO_CONSUMPTION_READ:'true',FEATURE_M365_PAYG_BILLING_READ:'true'}}
+function generate(){persist();const m=model();b('workflowInputs').textContent=JSON.stringify({tenant_id:m.tenantId,tenant_domain:m.tenantDomain,reader_upn:m.reader,status_admin_upn:m.status,change_admin_upn:m.change,notification_mail:m.mail},null,2);b('templateCommands').textContent=['# Erzeugt eine neue Kopie aus dem Community-Template','gh repo create '+m.full+' --template '+m.templateOwner+'/'+m.templateRepo+' '+(m.isPrivate?'--private':'--public'),'gh repo clone '+m.full].join('\n');b('variableCommands').textContent=Object.entries(getVars(m)).map(([k,val])=>'gh variable set '+k+' --repo '+m.full+' --body "'+esc(val)+'"').join('\n');b('actionLinks').textContent=['Repository: https://github.com/'+m.full,'Pages: https://'+m.targetOwner+'.github.io/'+m.targetRepo+'/','Actions: https://github.com/'+m.full+'/actions','Setup Page Deploy: https://github.com/'+m.full+'/actions/workflows/90-deploy-setup-page.yml','Bootstrap Plan: https://github.com/'+m.full+'/actions/workflows/10-bootstrap-plan.yml','Worker Requirements: https://github.com/'+m.full+'/actions/workflows/00-validate-worker-requirements.yml','Permission Checks: https://github.com/'+m.full+'/actions/workflows/20-check-permissions.yml'].join('\n')}
+function validate(){const token=v('githubToken');if(!token)throw new Error('GitHub Token fehlt.');const m=model();const missing=[];['templateOwner','templateRepo','targetOwner','targetRepo','tenantId','tenantDomain','reader','status','change','mail'].forEach(k=>{if(!m[k])missing.push(k)});if(missing.length)throw new Error('Pflichtwerte fehlen: '+missing.join(', '));return {token,m}}
+function friendlyError(method,url,status,text){if(status===403)return method+' '+url+' -> 403: Token hat nicht genug Rechte oder passt nicht zum Target Owner.';if(status===404)return method+' '+url+' -> 404: Ressource nicht gefunden oder Workflow noch nicht von GitHub indexiert.';if(status===422&&text.includes('current plan'))return method+' '+url+' -> 422: GitHub Pages benötigt bei kostenlosen GitHub-Konten ein public Repository.';return method+' '+url+' -> '+status+': '+text}
+async function gh(method,url,token,body){const res=await fetch(url,{method,headers:{Accept:'application/vnd.github+json',Authorization:'Bearer '+token,'X-GitHub-Api-Version':'2022-11-28',...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});if(!res.ok&&res.status!==204){const text=await res.text();throw new Error(friendlyError(method,url,res.status,text))}if(res.status===204)return null;try{return await res.json()}catch{return null}}
+function pagesWorkflowContent(){return [
+'name: 90 - Deploy Setup Page','',
+'on:','  workflow_dispatch:','',
+'permissions:','  contents: read','  pages: write','  id-token: write','',
+'concurrency:','  group: github-pages','  cancel-in-progress: true','',
+'jobs:','  deploy:','    runs-on: ubuntu-latest','    environment:','      name: github-pages','      url: ${{ steps.deployment.outputs.page_url }}','    steps:','      - name: Checkout','        uses: actions/checkout@v4','',
+'      - name: Prepare static site','        shell: bash','        run: |','          rm -rf _site','          mkdir -p _site','          cp -R setup/* _site/','',
+'      - name: Upload Pages artifact','        uses: actions/upload-pages-artifact@v4','        with:','          path: _site','',
+'      - name: Deploy to GitHub Pages','        id: deployment','        uses: actions/deploy-pages@v4',''
+].join('\n')}
+function b64Utf8(text){const bytes=new TextEncoder().encode(text);let bin='';bytes.forEach(byte=>bin+=String.fromCharCode(byte));return btoa(bin)}
+async function ensurePublicRepositoryForPages(token,m){const repoUrl='https://api.github.com/repos/'+m.targetOwner+'/'+m.targetRepo;const repo=await gh('GET',repoUrl,token);if(repo&&repo.private===true){log('GitHub Pages auf kostenlosen GitHub-Konten benötigt ein public Repository. Stelle Zielrepository auf public um ...');await gh('PATCH',repoUrl,token,{private:false});await sleep(3000);log('Zielrepository ist jetzt public.')}}
+async function ensurePagesWorkflowFile(token,m){const fileUrl='https://api.github.com/repos/'+m.targetOwner+'/'+m.targetRepo+'/contents/.github/workflows/90-deploy-setup-page.yml';let existing=null;try{existing=await gh('GET',fileUrl+'?ref='+encodeURIComponent(m.ref||'main'),token)}catch(e){if(!String(e.message).includes('404'))throw e}const payload={message:'Add or update setup page deployment workflow',content:b64Utf8(pagesWorkflowContent()),branch:m.ref||'main'};if(existing&&existing.sha)payload.sha=existing.sha;await gh('PUT',fileUrl,token,payload);log(existing?'Pages-Workflow im Zielrepository aktualisiert.':'Pages-Workflow im Zielrepository erstellt.');await sleep(10000)}
+async function enablePagesForTargetRepository(token,m){await ensurePublicRepositoryForPages(token,m);log('Aktiviere GitHub Pages für '+m.full+' ...');const base='https://api.github.com/repos/'+m.targetOwner+'/'+m.targetRepo+'/pages';const body={build_type:'workflow',source:{branch:m.ref||'main',path:'/'}};try{await gh('GET',base,token);await gh('PUT',base,token,body);log('GitHub Pages wurde aktualisiert.')}catch(e){const msg=String(e.message||'');if(msg.includes('404')){await gh('POST',base,token,body);log('GitHub Pages wurde aktiviert.')}else{throw e}}}
+async function createRepoFromTemplate(){resetLog();generate();const {token,m}=validate();if(m.createMode==='existing'){log('Repository-Erstellung übersprungen: Zielrepository existiert bereits.');return}log('Erzeuge Enduser-Repository '+m.full+' aus Template '+m.templateOwner+'/'+m.templateRepo+' ...');await gh('POST','https://api.github.com/repos/'+m.templateOwner+'/'+m.templateRepo+'/generate',token,{owner:m.targetOwner,name:m.targetRepo,description:'Agent Compliance Community Edition - Enduser Repository',include_all_branches:false,private:m.isPrivate});log('Repository-Kopie erstellt. Warte kurz, bis GitHub Workflows sichtbar sind ...');await sleep(8000)}
+async function upsertVar(token,m,name,value){const base='https://api.github.com/repos/'+m.targetOwner+'/'+m.targetRepo+'/actions/variables';try{await gh('PATCH',base+'/'+encodeURIComponent(name),token,{name,value:String(value??'')});log('Variable aktualisiert: '+name)}catch(e){if(!String(e.message).includes('404'))throw e;await gh('POST',base,token,{name,value:String(value??'')});log('Variable erstellt: '+name)}}
+async function setRepositoryVariables(){resetLog();generate();const {token,m}=validate();log('Setze Variables in '+m.full+' ...');for(const [name,value] of Object.entries(getVars(m))){await upsertVar(token,m,name,value)}log('Repository Variables abgeschlossen.')}
+async function dispatchWorkflow(token,m,file,inputs){const url='https://api.github.com/repos/'+m.targetOwner+'/'+m.targetRepo+'/actions/workflows/'+encodeURIComponent(file)+'/dispatches';let lastError=null;for(let i=1;i<=4;i++){try{await gh('POST',url,token,{ref:m.ref,inputs});log('Workflow gestartet: '+file);return}catch(e){lastError=e;if(!String(e.message).includes('404')||i===4)break;log('Workflow '+file+' noch nicht indexiert. Warte und versuche erneut ...');await sleep(5000)}}throw lastError}
+async function dispatchInitialWorkflows(){resetLog();generate();try{const {token,m}=validate();await enablePagesForTargetRepository(token,m);await ensurePagesWorkflowFile(token,m);await dispatchWorkflow(token,m,'90-deploy-setup-page.yml',{});await dispatchWorkflow(token,m,'10-bootstrap-plan.yml',{tenant_id:m.tenantId,tenant_domain:m.tenantDomain,reader_upn:m.reader,status_admin_upn:m.status,change_admin_upn:m.change,notification_mail:m.mail});await dispatchWorkflow(token,m,'00-validate-worker-requirements.yml',{skip_module_install:'false'});await dispatchWorkflow(token,m,'20-check-permissions.yml',{skip_certificate_secret_checks:m.skipSecrets});log('Initial-Workflows gestartet. GitHub Actions im Zielrepository prüfen.')}catch(e){log('FEHLER: '+e.message);alert(e.message)}}
+function getNextStepUrl(m){const url=new URL('https://'+m.targetOwner+'.github.io/'+m.targetRepo+'/entra-bootstrap.html');url.searchParams.set('owner',m.targetOwner);url.searchParams.set('repo',m.targetRepo);url.searchParams.set('tenantId',m.tenantId);url.searchParams.set('tenantDomain',m.tenantDomain);url.searchParams.set('ref',m.ref||'main');return url.toString()}
+async function redirectToNextStep(m){const nextUrl=getNextStepUrl(m);log('Nächster Schritt: Entra App Bootstrap');log('Weiterleitung in 45 Sekunden: '+nextUrl);await sleep(45000);window.location.href=nextUrl}
+async function runFullBootstrap(){resetLog();generate();try{const {token,m}=validate();await createRepoFromTemplate();await enablePagesForTargetRepository(token,m);await ensurePagesWorkflowFile(token,m);for(const [name,value] of Object.entries(getVars(m))){await upsertVar(token,m,name,value)}await dispatchWorkflow(token,m,'90-deploy-setup-page.yml',{});await dispatchWorkflow(token,m,'10-bootstrap-plan.yml',{tenant_id:m.tenantId,tenant_domain:m.tenantDomain,reader_upn:m.reader,status_admin_upn:m.status,change_admin_upn:m.change,notification_mail:m.mail});await dispatchWorkflow(token,m,'00-validate-worker-requirements.yml',{skip_module_install:'false'});await dispatchWorkflow(token,m,'20-check-permissions.yml',{skip_certificate_secret_checks:m.skipSecrets});log('Fertig: Enduser-Repo, Variables und Initial-Workflows wurden angestoßen.');await redirectToNextStep(m)}catch(e){log('FEHLER: '+e.message);alert(e.message)}}
+function copyDeepLink(){generate();const m=model();const url=new URL(location.href);url.search='';const p=url.searchParams;p.set('templateOwner',m.templateOwner);p.set('templateRepo',m.templateRepo);p.set('targetOwner',m.targetOwner);p.set('targetRepo',m.targetRepo);p.set('tenantId',m.tenantId);p.set('tenantDomain',m.tenantDomain);p.set('readerUpn',m.reader);p.set('statusAdminUpn',m.status);p.set('changeAdminUpn',m.change);p.set('notificationMail',m.mail);p.set('mode',m.mode);p.set('ref',m.ref);navigator.clipboard.writeText(url.toString()).then(()=>alert('Setup-Link kopiert.'))}
+function copy(id){navigator.clipboard.writeText(b(id).textContent).then(()=>alert('In die Zwischenablage kopiert.'))}
+ids.forEach(id=>el(id).addEventListener('input',generate));restore();applyParams();generate();
+</script>
+</body>
+</html>
+
+

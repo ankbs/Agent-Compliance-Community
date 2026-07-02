@@ -1,0 +1,20 @@
+{
+  "environments": [
+    {
+      "name": "mycloudofficedev (default)",
+      "type": "Standard",
+      "allocatedCapacity": 0,
+      "consumedCapacity": 0,
+      "billingPlan": "PowerPlatformAbrechnungsplanCopilotStudio",
+      "overagePolicy": "An meinen Plan für die nutzungsbasierte Bezahlung abrechnen"
+    },
+    {
+      "name": "mycloudofficedev",
+      "type": "Standard",
+      "allocatedCapacity": 0,
+      "consumedCapacity": 0,
+      "billingPlan": "PowerPlatformAbrechnungsplanCopilotStudio",
+      "overagePolicy": "An meinen Plan für die nutzungsbasierte Bezahlung abrechnen"
+    }
+  ]
+}

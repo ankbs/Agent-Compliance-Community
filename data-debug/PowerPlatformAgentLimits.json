@@ -1,0 +1,11 @@
+{
+  "collector": "Power Platform Agent Limits",
+  "status": "preview",
+  "generatedAt": "2026-06-29T14:16:46.3457268Z",
+  "note": "Fehlende Umgebungsvariablen. Power Platform Daten werden als inaktiv angezeigt.",
+  "data": {
+    "isLive": false,
+    "environments": [],
+    "error": null
+  }
+}

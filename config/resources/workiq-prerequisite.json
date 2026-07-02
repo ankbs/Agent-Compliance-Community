@@ -1,0 +1,13 @@
+{
+  "name": "WorkIQ",
+  "description": "Prerequisite Microsoft resource service principal for delegated WorkIQAgent.Ask consent. This is not an Agent Compliance app profile.",
+  "appId": "fdcc1f02-fc51-4226-8753-f668596af7f7",
+  "requiredBootstrapPermission": "Application.ReadWrite.All",
+  "delegatedScopes": [
+    "WorkIQAgent.Ask"
+  ],
+  "notes": [
+    "The bootstrap creates or verifies this Microsoft resource service principal so WorkIQAgent.Ask can be resolved.",
+    "No certificate, secret or separate Agent Compliance app registration is created for WorkIQ."
+  ]
+}

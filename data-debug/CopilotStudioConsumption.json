@@ -1,0 +1,11 @@
+{
+  "collector": "Copilot Studio Analytics",
+  "status": "preview",
+  "generatedAt": "2026-06-29T14:16:46.3340897Z",
+  "note": "Fehlende Umgebungsvariablen. Copilot Studio Aktivitäten werden als inaktiv angezeigt.",
+  "data": {
+    "isLive": false,
+    "bots": [],
+    "error": null
+  }
+}

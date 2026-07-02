@@ -1,0 +1,7 @@
+{
+  "collector": "Microsoft 365 Copilot Usage Report",
+  "status": "preview",
+  "generatedAt": "2026-06-29T14:16:46.3170682Z",
+  "note": "Preview dataset. Live API integration for this collector is tracked separately.",
+  "data": []
+}
